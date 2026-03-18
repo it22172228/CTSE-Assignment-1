@@ -1,0 +1,84 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - app_network
+
+  user-service:
+    build:
+      context: ./services/user-service
+      dockerfile: Dockerfile
+    container_name: user-service
+    ports:
+      - "3001:3000"
+    environment:
+      - PORT=3000
+      - MONGO_URI=mongodb://mongodb:27017/user_db
+      - JWT_SECRET=super_secret_user
+    depends_on:
+      - mongodb
+    networks:
+      - app_network
+
+  restaurant-service:
+    build:
+      context: ./services/restaurant-service
+      dockerfile: Dockerfile
+    container_name: restaurant-service
+    ports:
+      - "3002:3000"
+    environment:
+      - PORT=3000
+      - MONGO_URI=mongodb://mongodb:27017/restaurant_db
+      - JWT_SECRET=super_secret_user
+    depends_on:
+      - mongodb
+    networks:
+      - app_network
+
+  order-service:
+    build:
+      context: ./services/order-service
+      dockerfile: Dockerfile
+    container_name: order-service
+    ports:
+      - "3003:3000"
+    environment:
+      - PORT=3000
+      - MONGO_URI=mongodb://mongodb:27017/order_db
+      - JWT_SECRET=super_secret_user
+      - NOTIFICATION_SERVICE_URL=http://notification-service:3000/api/notifications
+    depends_on:
+      - mongodb
+    networks:
+      - app_network
+
+  notification-service:
+    build:
+      context: ./services/notification-service
+      dockerfile: Dockerfile
+    container_name: notification-service
+    ports:
+      - "3004:3000"
+    environment:
+      - PORT=3000
+      - MONGO_URI=mongodb://mongodb:27017/notification_db
+      - JWT_SECRET=super_secret_user
+    depends_on:
+      - mongodb
+    networks:
+      - app_network
+
+volumes:
+  mongodb_data:
+
+networks:
+  app_network:
+    driver: bridge
