@@ -53,7 +53,7 @@ const CartPage = () => {
 
     if (success) {
         return (
-            <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-white via-blue-50 to-indigo-100 px-4">
+            <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-white via-orange-50 to-amber-50 dark:from-dark dark:via-slate-900 dark:to-dark-secondary px-4 transition-colors duration-300">
                 <motion.div
                     initial={{ scale: 0, rotate: -180 }}
                     animate={{ scale: 1, rotate: 0 }}
@@ -88,7 +88,7 @@ const CartPage = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-white via-blue-50 to-indigo-100 py-12 px-4">
+        <div className="min-h-screen bg-gradient-to-br from-white via-orange-50 to-amber-50 dark:from-dark dark:via-slate-900 dark:to-dark-secondary py-12 px-4 transition-colors duration-300">
             <div className="max-w-4xl mx-auto">
                 {/* Header */}
                 <motion.button

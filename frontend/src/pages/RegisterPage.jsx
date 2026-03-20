@@ -32,22 +32,22 @@ const RegisterPage = () => {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-12">
+        <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-dark px-4 py-12 transition-colors duration-300">
             <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="w-full max-w-md bg-white rounded-3xl shadow-xl p-8 border border-gray-100"
+                className="w-full max-w-md bg-white dark:bg-dark-secondary rounded-3xl shadow-xl p-8 border border-gray-100 dark:border-gray-700"
             >
                 <div className="text-center mb-8">
-                    <div className="bg-primary-100 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 text-primary-600">
+                    <div className="bg-primary-100 dark:bg-primary-900 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 text-primary-600 dark:text-primary-400">
                         <UserPlus size={32} />
                     </div>
-                    <h2 className="text-3xl font-bold text-gray-900">Create Account</h2>
-                    <p className="text-gray-500 mt-2">Join SmartEat for premium delivery</p>
+                    <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Create Account</h2>
+                    <p className="text-gray-500 dark:text-gray-400 mt-2">Join SmartEat for premium delivery</p>
                 </div>
 
                 {error && (
-                    <div className="bg-red-50 text-red-600 p-4 rounded-xl mb-6 text-sm font-medium">
+                    <div className="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 p-4 rounded-xl mb-6 text-sm font-medium">
                         {error}
                     </div>
                 )}
@@ -80,6 +80,7 @@ const RegisterPage = () => {
                         <select value={role} onChange={(e) => setRole(e.target.value)} className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-shadow mb-4">
                             <option value="user">User</option>
                             <option value="owner">Restaurant Owner</option>
+                            <option value="admin">Admin</option>
                         </select>
                     </div>
                     <div>

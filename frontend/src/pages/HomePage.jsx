@@ -56,7 +56,7 @@ const HomePage = () => {
     };
 
     return (
-        <div className="min-h-screen pb-20 bg-gradient-to-br from-white via-blue-50 to-indigo-100">
+        <div className="min-h-screen pb-20 bg-gradient-to-br from-white via-orange-50 to-amber-50 dark:from-dark dark:via-slate-900 dark:to-dark-secondary transition-colors duration-300">
             {/* Hero Section */}
             <div className="relative overflow-hidden">
                 {/* Animated Background Elements */}
@@ -65,23 +65,23 @@ const HomePage = () => {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ duration: 1 }}
-                        className="absolute top-0 left-0 w-96 h-96 bg-gradient-to-br from-blue-400/20 to-indigo-400/20 rounded-full blur-3xl"
+                        className="absolute top-0 left-0 w-96 h-96 bg-gradient-to-br from-primary-400/20 to-accent-400/20 dark:from-primary-500/10 dark:to-accent-500/10 rounded-full blur-3xl"
                     ></motion.div>
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ duration: 1, delay: 0.2 }}
-                        className="absolute bottom-10 right-10 w-96 h-96 bg-gradient-to-br from-purple-400/20 to-pink-400/20 rounded-full blur-3xl"
+                        className="absolute bottom-10 right-10 w-96 h-96 bg-gradient-to-br from-accent-400/20 to-primary-400/20 dark:from-accent-500/10 dark:to-primary-500/10 rounded-full blur-3xl"
                     ></motion.div>
                 </div>
 
-                <div className="relative z-10 bg-gradient-to-b from-blue-600 via-indigo-600 to-purple-600 text-white py-20 px-4">
+                <div className="relative z-10 bg-gradient-to-b from-primary-600 via-primary-600 to-accent-600 dark:from-dark-secondary dark:via-dark dark:to-dark-secondary text-white py-20 px-4">
                     <div className="max-w-7xl mx-auto flex flex-col items-center text-center">
                         {/* Badge */}
                         <motion.div
                             initial={{ opacity: 0, y: -20 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-md px-4 py-2 rounded-full mb-6 border border-white/30"
+                            className="inline-flex items-center gap-2 bg-white/20 dark:bg-white/10 backdrop-blur-md px-4 py-2 rounded-full mb-6 border border-white/30 dark:border-white/20"
                         >
                             <Zap size={16} className="text-yellow-300" />
                             <span className="text-sm font-semibold">Order Now, Eat Fresh</span>
@@ -96,7 +96,7 @@ const HomePage = () => {
                         >
                             Premium Food,
                             <br />
-                            <span className="bg-gradient-to-r from-yellow-200 via-pink-200 to-blue-200 bg-clip-text text-transparent">
+                            <span className="bg-gradient-to-r from-yellow-200 via-orange-100 to-amber-200 bg-clip-text text-transparent">
                                 Delivered Fast
                             </span>
                         </motion.h1>
@@ -179,8 +179,8 @@ const HomePage = () => {
                             whileTap={{ scale: 0.95 }}
                             onClick={() => setFilter(c)}
                             className={`whitespace-nowrap px-6 py-3 rounded-full font-bold transition-all ${filter === c
-                                ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-400'
-                                : 'bg-white text-gray-700 hover:bg-gray-50 border-2 border-gray-200'
+                                ? 'bg-gradient-to-r from-primary-600 to-accent-600 text-white shadow-lg'
+                                : 'bg-white dark:bg-dark-secondary text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-gray-700 border-2 border-gray-200 dark:border-gray-600'
                                 }`}
                         >
                             {c}
@@ -202,12 +202,12 @@ const HomePage = () => {
                             <motion.div
                                 key={i}
                                 variants={itemVariants}
-                                className="animate-pulse bg-white rounded-2xl overflow-hidden h-96 border border-gray-200 shadow-lg"
+                                className="animate-pulse bg-white dark:bg-dark-secondary rounded-2xl overflow-hidden h-96 border border-gray-200 dark:border-gray-700 shadow-lg"
                             >
-                                <div className="bg-gradient-to-r from-gray-200 to-gray-300 h-56 w-full"></div>
+                                <div className="bg-gradient-to-r from-gray-200 dark:from-gray-700 to-gray-300 dark:to-gray-600 h-56 w-full"></div>
                                 <div className="p-6 space-y-3">
-                                    <div className="h-6 bg-gray-200 rounded-lg w-3/4"></div>
-                                    <div className="h-4 bg-gray-200 rounded-lg w-1/2"></div>
+                                    <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded-lg w-3/4"></div>
+                                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded-lg w-1/2"></div>
                                 </div>
                             </motion.div>
                         ))}
@@ -229,11 +229,11 @@ const HomePage = () => {
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="text-center py-20 bg-gradient-to-br from-white to-gray-50 rounded-3xl border-2 border-dashed border-gray-300"
+                        className="text-center py-20 bg-gradient-to-br from-white dark:from-dark-secondary to-gray-50 dark:to-dark rounded-3xl border-2 border-dashed border-gray-300 dark:border-gray-700"
                     >
-                        <Search size={48} className="mx-auto text-gray-400 mb-4" />
-                        <h3 className="text-2xl font-bold text-gray-900 mb-2">No restaurants found</h3>
-                        <p className="text-gray-600">Try adjusting your search criteria or browse all available options</p>
+                        <Search size={48} className="mx-auto text-gray-400 dark:text-gray-500 mb-4" />
+                        <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">No restaurants found</h3>
+                        <p className="text-gray-600 dark:text-gray-400">Try adjusting your search criteria or browse all available options</p>
                     </motion.div>
                 )}
             </div>
