@@ -157,6 +157,22 @@ CTSE-Assignment-1/
 4. Test thoroughly
 5. Submit a pull request
 
+## Commit message guide
+
+Use descriptive commit messages, for example:
+
+- `docs(readme): add project setup + microservices overview`
+- `feat(frontend): implement cart checkout flow`
+- `fix(order-service): correct order status update logic`
+
+Then push to GitHub:
+
+```bash
+git add .
+git commit -m "docs(readme): add project setup + microservices overview"
+git push origin your-branch
+```
+
 ## License
 
 This project is for educational purposes as part of CTSE Assignment 1.
