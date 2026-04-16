@@ -1,178 +1,42 @@
-User Service: user-app.wittyglacier-d214fa2c.southeastasia.azurecontainerapps.io
-Restaurant Service: restaurant-app.wittyglacier-d214fa2c.southeastasia.azurecontainerapps.io
-Order Service: order-app.wittyglacier-d214fa2c.southeastasia.azurecontainerapps.io
-Notification Service: notification-app.wittyglacier-d214fa2c.southeastasia.azurecontainerapps.io
+SmarterEAT — quick deployment & run notes
 
-# Food Ordering Microservices Application
+Live endpoints
+- Frontend: https://frontend-app.ashysea-0fd884f4.southeastasia.azurecontainerapps.io
+- User API: https://user-app.ashysea-0fd884f4.southeastasia.azurecontainerapps.io/api
+- Restaurant API: https://restaurant-app.ashysea-0fd884f4.southeastasia.azurecontainerapps.io/api
+- Order API: https://order-app.ashysea-0fd884f4.southeastasia.azurecontainerapps.io/api
+- Notification API: https://notification-app.ashysea-0fd884f4.southeastasia.azurecontainerapps.io/api
 
-## Overview
+Run locally (Docker Compose)
+1. Create per-service `.env` files inside each `services/<service-name>/` directory containing at minimum:
+	- `MONGO_URI` (MongoDB Atlas or local Mongo)
+	- `JWT_SECRET` (must be identical across services for auth to work)
+2. Start services:
+	```powershell
+	docker compose up -d --build
+	docker compose logs --tail 200
+	```
+3. Confirm services are healthy:
+	- User health: `http(s)://localhost:1000/health`
+	- Restaurant: `http(s)://localhost:4000/health`
+	- Order: `http(s)://localhost:3000/health`
+	- Notification: `http(s)://localhost:2000/health`
 
-This project is a comprehensive food ordering platform built using a microservices architecture. It consists of a React-based frontend and multiple backend services handling user management, restaurants, orders, and notifications. The application supports multiple user roles including customers, restaurant owners, and administrators.
+Notes for local setup
+- The repository includes a template `.env` at root showing example connection strings — copy and edit to create real `.env` files per service.
+- If you prefer local Mongo for development, add a `mongodb` service to `docker-compose.yml` and point `MONGO_URI` to `mongodb://mongodb:27017/<db>`.
+- Services exit on DB connection failure by design; ensure `MONGO_URI` is reachable from Docker.
 
-## Features
+Azure deployment notes
+- Container Registry: `smarteatregistry.azurecr.io` (images pushed here)
+- Container Apps environment: `smarteat-env` in resource group `smarteat-rg` (Southeast Asia)
+- Secrets configured in Container Apps: `mongo-uri` and `jwt-secret` (must match live Atlas creds and JWT secret)
+- Frontend: container listens on port 5000 in the deployed image; Container App ingress was configured to `targetPort=5000`.
+- Frontend runtime envs (`VITE_USER_SERVICE_URL`, `VITE_RESTAURANT_SERVICE_URL`, `VITE_ORDER_SERVICE_URL`, `VITE_NOTIFICATION_SERVICE_URL`) are set at Container App deploy time so the UI can call backend FQDNs.
 
-- **User Authentication & Authorization**: JWT-based authentication with role-based access control
-- **Restaurant Management**: Owners can manage their restaurants and menu items
-- **Order Management**: Customers can place orders, track them in real-time
-- **Cart Functionality**: Add items to cart, manage quantities
-- **Real-time Notifications**: Get updates on order status
-- **Admin Dashboard**: Administrative oversight and management
-- **Responsive Design**: Mobile-friendly interface using Tailwind CSS
+Troubleshooting
+- If frontend shows "stream timeout" or blank page, check Container App logs and confirm `targetPort` matches the port the container listens on, and that `VITE_*` envs are present.
+- If JWT-protected endpoints return 401, verify the `JWT_SECRET` used by the client and services are identical.
+- For Azure CLI issues (quoting, PowerShell parsing), use Azure Cloud Shell or pass sensitive values via `--registry-password` and `--secrets` when creating apps.
 
-## Architecture
-
-The application follows a microservices architecture with the following components:
-
-- **Frontend**: React application with Vite build tool
-- **User Service**: Handles authentication and user management
-- **Restaurant Service**: Manages restaurant and menu data
-- **Order Service**: Processes and tracks orders
-- **Notification Service**: Sends real-time notifications
-- **MongoDB**: Shared database for all services
-
-## Tech Stack
-
-### Frontend
-- React 19
-- Vite
-- Tailwind CSS
-- Axios for API calls
-- React Router for navigation
-- Framer Motion for animations
-- Lucide React for icons
-
-### Backend Services
-- Node.js with Express.js
-- MongoDB with Mongoose
-- JWT for authentication
-- CORS and Helmet for security
-- Docker for containerization
-
-### Infrastructure
-- Docker Compose for local development
-- Azure Container Apps for deployment
-
-## Getting Started
-
-### Prerequisites
-- Docker and Docker Compose
-- Node.js (for local frontend development)
-- Git
-
-### Installation
-
-1. Clone the repository:
-   ```bash
-   git clone <repository-url>
-   cd CTSE-Assignment-1
-   ```
-
-2. Start the services using Docker Compose:
-   ```bash
-   docker-compose up --build
-   ```
-
-3. For frontend development, navigate to the frontend directory:
-   ```bash
-   cd frontend
-   npm install
-   npm run dev
-   ```
-
-### Services URLs (Local Development)
-- Frontend: http://localhost:5173
-- User Service: http://localhost:1000
-- Restaurant Service: http://localhost:4000
-- Order Service: http://localhost:3000
-- Notification Service: http://localhost:2000
-- MongoDB: localhost:27017
-
-## API Endpoints
-
-### User Service
-- `POST /api/auth/login` - User login
-- `POST /api/auth/register` - User registration
-- `GET /api/users/profile` - Get user profile
-
-### Restaurant Service
-- `GET /api/restaurants` - Get all restaurants
-- `POST /api/restaurants` - Create restaurant (owner only)
-- `GET /api/restaurants/:id/menu` - Get restaurant menu
-
-### Order Service
-- `POST /api/orders` - Place new order
-- `GET /api/orders/:id` - Get order details
-- `PUT /api/orders/:id/status` - Update order status
-
-### Notification Service
-- `GET /api/notifications` - Get user notifications
-- `POST /api/notifications` - Send notification
-
-## Deployment
-
-The application is deployed on Azure Container Apps. The deployed services are accessible at the URLs listed at the top of this file.
-
-## Project Structure
-
-```
-CTSE-Assignment-1/
-├── docker-compose.yml
-├── azure/
-│   └── containerApps-template.bicep
-├── frontend/
-│   ├── src/
-│   │   ├── components/
-│   │   ├── pages/
-│   │   ├── context/
-│   │   └── utils/
-│   ├── package.json
-│   └── vite.config.js
-└── services/
-    ├── user-service/
-    ├── restaurant-service/
-    ├── order-service/
-    └── notification-service/
-        ├── controllers/
-        ├── models/
-        ├── routes/
-        ├── middleware/
-        └── config/
-```
-
-## Usage
-
-1. **Register/Login**: Create an account or log in with existing credentials
-2. **Browse Restaurants**: View available restaurants and their menus
-3. **Add to Cart**: Select items and add them to your cart
-4. **Place Order**: Review cart and place your order
-5. **Track Order**: Monitor order status in real-time
-6. **Manage Restaurant** (Owner): Add/edit restaurants and menu items
-7. **Admin Panel** (Admin): Oversee users, restaurants, and orders
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
-
-## Commit message guide
-
-Use descriptive commit messages, for example:
-
-- `docs(readme): add project setup + microservices overview`
-- `feat(frontend): implement cart checkout flow`
-- `fix(order-service): correct order status update logic`
-
-Then push to GitHub:
-
-```bash
-git add .
-git commit -m "docs(readme): add project setup + microservices overview"
-git push origin your-branch
-```
-
-## License
-
-This project is for educational purposes as part of CTSE Assignment 1.
+If you want, I can add a short script to rebuild and push frontend image and re-deploy the frontend Container App automatically.
