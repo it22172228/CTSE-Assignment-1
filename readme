@@ -1,4 +1,42 @@
-User Service: user-app.wittyglacier-d214fa2c.southeastasia.azurecontainerapps.io
-Restaurant Service: restaurant-app.wittyglacier-d214fa2c.southeastasia.azurecontainerapps.io
-Order Service: order-app.wittyglacier-d214fa2c.southeastasia.azurecontainerapps.io
-Notification Service: notification-app.wittyglacier-d214fa2c.southeastasia.azurecontainerapps.io
+SmarterEAT — quick deployment & run notes
+
+Live endpoints
+- Frontend: https://frontend-app.ashysea-0fd884f4.southeastasia.azurecontainerapps.io
+- User API: https://user-app.ashysea-0fd884f4.southeastasia.azurecontainerapps.io/api
+- Restaurant API: https://restaurant-app.ashysea-0fd884f4.southeastasia.azurecontainerapps.io/api
+- Order API: https://order-app.ashysea-0fd884f4.southeastasia.azurecontainerapps.io/api
+- Notification API: https://notification-app.ashysea-0fd884f4.southeastasia.azurecontainerapps.io/api
+
+Run locally (Docker Compose)
+1. Create per-service `.env` files inside each `services/<service-name>/` directory containing at minimum:
+	- `MONGO_URI` (MongoDB Atlas or local Mongo)
+	- `JWT_SECRET` (must be identical across services for auth to work)
+2. Start services:
+	```powershell
+	docker compose up -d --build
+	docker compose logs --tail 200
+	```
+3. Confirm services are healthy:
+	- User health: `http(s)://localhost:1000/health`
+	- Restaurant: `http(s)://localhost:4000/health`
+	- Order: `http(s)://localhost:3000/health`
+	- Notification: `http(s)://localhost:2000/health`
+
+Notes for local setup
+- The repository includes a template `.env` at root showing example connection strings — copy and edit to create real `.env` files per service.
+- If you prefer local Mongo for development, add a `mongodb` service to `docker-compose.yml` and point `MONGO_URI` to `mongodb://mongodb:27017/<db>`.
+- Services exit on DB connection failure by design; ensure `MONGO_URI` is reachable from Docker.
+
+Azure deployment notes
+- Container Registry: `smarteatregistry.azurecr.io` (images pushed here)
+- Container Apps environment: `smarteat-env` in resource group `smarteat-rg` (Southeast Asia)
+- Secrets configured in Container Apps: `mongo-uri` and `jwt-secret` (must match live Atlas creds and JWT secret)
+- Frontend: container listens on port 5000 in the deployed image; Container App ingress was configured to `targetPort=5000`.
+- Frontend runtime envs (`VITE_USER_SERVICE_URL`, `VITE_RESTAURANT_SERVICE_URL`, `VITE_ORDER_SERVICE_URL`, `VITE_NOTIFICATION_SERVICE_URL`) are set at Container App deploy time so the UI can call backend FQDNs.
+
+Troubleshooting
+- If frontend shows "stream timeout" or blank page, check Container App logs and confirm `targetPort` matches the port the container listens on, and that `VITE_*` envs are present.
+- If JWT-protected endpoints return 401, verify the `JWT_SECRET` used by the client and services are identical.
+- For Azure CLI issues (quoting, PowerShell parsing), use Azure Cloud Shell or pass sensitive values via `--registry-password` and `--secrets` when creating apps.
+
+If you want, I can add a short script to rebuild and push frontend image and re-deploy the frontend Container App automatically.
