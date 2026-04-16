@@ -12,6 +12,18 @@ RUN npm ci
 # Copy source code
 COPY . .
 
+# Build-time args for Vite envs (so built bundle contains correct service URLs)
+ARG VITE_USER_API
+ARG VITE_RESTAURANT_API
+ARG VITE_ORDER_API
+ARG VITE_NOTIFICATION_API
+ENV NODE_ENV=production
+
+# Create a .env file for Vite from build args
+RUN printf "VITE_USER_API=%s\nVITE_RESTAURANT_API=%s\nVITE_ORDER_API=%s\nVITE_NOTIFICATION_API=%s\nNODE_ENV=%s\n" \ 
+	"$VITE_USER_API" "$VITE_RESTAURANT_API" "$VITE_ORDER_API" "$VITE_NOTIFICATION_API" "$NODE_ENV" > .env
+RUN cp .env .env.production
+
 # Build the application
 RUN npm run build
 
