@@ -76,7 +76,7 @@ const AdminDashboard = () => {
 
                 // Fetch order analytics
                 try {
-                    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3003/api';
+                    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:1000/api';
                     const orderAnalyticsRes = await axios.get(`${apiBaseUrl.replace('/api', '')}/api/analytics`, {
                         headers: {
                             Authorization: `Bearer ${localStorage.getItem('token')}`
@@ -554,7 +554,7 @@ const AdminDashboard = () => {
                                                 </span>
                                             </td>
                                             <td className="px-6 py-4 text-sm text-gray-600">
-                                                {restaurant.ownerId.substring(0, 8)}...
+                                                {restaurant.ownerId ? `${String(restaurant.ownerId).substring(0, 8)}...` : '—'}
                                             </td>
                                             <td className="px-6 py-4">
                                                 <div className="flex items-center gap-1">
