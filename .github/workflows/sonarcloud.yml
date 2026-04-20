@@ -22,4 +22,4 @@ jobs:
             -Dsonar.organization=asho-1308
             -Dsonar.projectKey=asho-1308_ctse-assignment-1
         env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.CTSE }}
