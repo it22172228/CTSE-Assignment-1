@@ -35,3 +35,4 @@ jobs:
             -Dsonar.organization=asho-1308
             -Dsonar.projectKey=asho-1308_ctse-assignment-1
             -Dsonar.host.url=https://sonarcloud.io
+            -Dsonar.scm.revision=${{ github.event.pull_request.head.sha || github.sha }}
