@@ -25,30 +25,29 @@ jobs:
           SONAR_TOKEN: ${{ secrets.CTSE }}
         run: |
           set -e
-          # SONAR_JAVA_PATH is documentation for some versions, but setting it explicitly helps
+          # Force the use of Java 17 for the scanner
           export JAVA_HOME=$JAVA_HOME_17_X64
           export PATH=$JAVA_HOME/bin:$PATH
-          export SONAR_JAVA_PATH="$JAVA_HOME/bin/java"
           
+          # Download the JRE-less version to force it to use our Java 17
           SCANNER_VERSION=4.8.1.3023
-          ARCHIVE=sonar-scanner-cli-${SCANNER_VERSION}-linux.zip
+          ARCHIVE=sonar-scanner-cli-${SCANNER_VERSION}.zip
           URL="https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/${ARCHIVE}"
-          echo "Downloading SonarScanner ${SCANNER_VERSION}..."
+          
+          echo "Downloading SonarScanner (no JRE)..."
           curl -sSLo ${ARCHIVE} ${URL}
-          echo "Extracting..."
           unzip -o -q ${ARCHIVE}
           
           SCANNER_DIR=$(ls -d sonar-scanner-*/ 2>/dev/null | head -n1 || ls -d sonar-scanner-cli-*/ 2>/dev/null | head -n1)
           
-          # CRITICAL: The scanner often looks at the 'java' command in its own properties.
-          # We will force the scanner to use the setup-java version by overriding the property file
+          echo "Using scanner dir: ${SCANNER_DIR}"
+          # Inject java home directly into the scanner's settings
           echo "sonar.java.jdkHome=$JAVA_HOME" >> "${SCANNER_DIR}conf/sonar-scanner.properties"
           
-          echo "Using scanner dir: ${SCANNER_DIR}"
-          echo "Java version being used by shell:"
-          java -version
-          
           chmod +x "${SCANNER_DIR}bin/sonar-scanner"
+          
+          # Pass the variables directly to the JVM via SONAR_SCANNER_OPTS if needed, 
+          # but -D should work too
           "${SCANNER_DIR}bin/sonar-scanner" \
             -Dsonar.host.url=https://sonarcloud.io \
             -Dsonar.organization=asho-1308 \
