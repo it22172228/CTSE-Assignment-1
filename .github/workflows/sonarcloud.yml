@@ -7,50 +7,31 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
         with:
-          node-version: '18'
-      - name: Install frontend dependencies
-        run: |
-          cd frontend
-          npm ci
-      - name: Set up Java 17
+          fetch-depth: 0
+
+      - name: Setup Java 17
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
-      - name: Run SonarScanner CLI
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: |
+          cd frontend
+          npm install
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarqube-scan-action@v5.0.0
         env:
           SONAR_TOKEN: ${{ secrets.CTSE }}
-        run: |
-          set -e
-          # Force the use of Java 17 for the scanner
-          export JAVA_HOME=$JAVA_HOME_17_X64
-          export PATH=$JAVA_HOME/bin:$PATH
-          
-          # Download the JRE-less version to force it to use our Java 17
-          SCANNER_VERSION=4.8.1.3023
-          ARCHIVE=sonar-scanner-cli-${SCANNER_VERSION}.zip
-          URL="https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/${ARCHIVE}"
-          
-          echo "Downloading SonarScanner (no JRE)..."
-          curl -sSLo ${ARCHIVE} ${URL}
-          unzip -o -q ${ARCHIVE}
-          
-          SCANNER_DIR=$(ls -d sonar-scanner-*/ 2>/dev/null | head -n1 || ls -d sonar-scanner-cli-*/ 2>/dev/null | head -n1)
-          
-          echo "Using scanner dir: ${SCANNER_DIR}"
-          # Inject java home directly into the scanner's settings
-          echo "sonar.java.jdkHome=$JAVA_HOME" >> "${SCANNER_DIR}conf/sonar-scanner.properties"
-          
-          chmod +x "${SCANNER_DIR}bin/sonar-scanner"
-          
-          # Pass the variables directly to the JVM via SONAR_SCANNER_OPTS if needed, 
-          # but -D should work too
-          "${SCANNER_DIR}bin/sonar-scanner" \
-            -Dsonar.host.url=https://sonarcloud.io \
-            -Dsonar.organization=asho-1308 \
-            -Dsonar.projectKey=asho-1308_ctse-assignment-1 \
-            -Dsonar.login=${SONAR_TOKEN} \
-            -Dsonar.scanner.skipJreProvisioning=true
+        with:
+          args: >
+            -Dsonar.organization=asho-1308
+            -Dsonar.projectKey=asho-1308_ctse-assignment-1
+            -Dsonar.host.url=https://sonarcloud.io
