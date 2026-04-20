@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Star, Clock } from 'lucide-react';
+import { Star, Clock, Search, DollarSign } from 'lucide-react';
 import { restaurantAPI } from '../utils/api';
 import { useCart } from '../context/CartContext';
 import MenuItemCard from '../components/MenuItemCard';
@@ -11,6 +11,9 @@ const RestaurantPage = () => {
     const [restaurant, setRestaurant] = useState(null);
     const [menu, setMenu] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [selectedCategory, setSelectedCategory] = useState('All');
+    const [priceRange, setPriceRange] = useState([0, 100]);
     const { addToCart } = useCart();
 
     useEffect(() => {
@@ -43,11 +46,31 @@ const RestaurantPage = () => {
         </div>
     );
 
-    // Group menu by category
-    const categories = [...new Set(menu.map(item => item.category))];
+    // Get unique categories
+    const categories = ['All', ...new Set(menu.map(item => item.category))];
+
+    // Filter menu items based on search, category, and price
+    const filteredMenu = menu.filter(item => {
+        const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                            item.description?.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesCategory = selectedCategory === 'All' || item.category === selectedCategory;
+        const itemPrice = parseFloat(item.price || 0);
+        const matchesPrice = itemPrice >= priceRange[0] && itemPrice <= priceRange[1];
+        return matchesSearch && matchesCategory && matchesPrice;
+    });
+
+    // Group filtered menu by category
+    const categorizedItems = categories.reduce((acc, category) => {
+        if (category === 'All') return acc;
+        const items = filteredMenu.filter(item => item.category === category);
+        if (items.length > 0) {
+            acc[category] = items;
+        }
+        return acc;
+    }, {});
 
     return (
-        <div className="min-h-screen pb-20">
+        <div className="min-h-screen pb-20 bg-gray-50 dark:bg-dark">
             {/* Restaurant Header */}
             <div className="h-64 md:h-96 relative">
                 <img
@@ -85,38 +108,114 @@ const RestaurantPage = () => {
                 </div>
             </div>
 
-            {/* Menu Section */}
-            <div className="max-w-7xl mx-auto px-4 mt-8">
-                {categories.map((category, idx) => (
-                    <div key={category} className="mb-12">
-                        <motion.h2
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: idx * 0.1 }}
-                            className="text-2xl font-bold text-gray-900 mb-6"
+            {/* Search and Filter Section */}
+            <div className="max-w-7xl mx-auto px-4 mt-8 mb-10">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {/* Search Bar */}
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="md:col-span-2"
+                    >
+                        <div className="relative">
+                            <Search size={20} className="absolute left-3 top-3 text-gray-400 dark:text-gray-500" />
+                            <input
+                                type="text"
+                                placeholder="Search menu items..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                            />
+                        </div>
+                    </motion.div>
+
+                    {/* Price Range */}
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.1 }}
+                    >
+                        <div className="flex items-center gap-2">
+                            <DollarSign size={18} className="text-gray-600 dark:text-gray-400" />
+                            <input
+                                type="range"
+                                min="0"
+                                max="100"
+                                value={priceRange[1]}
+                                onChange={(e) => setPriceRange([0, parseFloat(e.target.value)])}
+                                className="w-full"
+                            />
+                            <span className="text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">${priceRange[1]}</span>
+                        </div>
+                    </motion.div>
+                </div>
+
+                {/* Category Filter */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 }}
+                    className="mt-6 flex flex-wrap gap-2"
+                >
+                    {categories.map((category) => (
+                        <button
+                            key={category}
+                            onClick={() => setSelectedCategory(category)}
+                            className={`px-4 py-2 rounded-full font-medium transition-all ${
+                                selectedCategory === category
+                                    ? 'bg-primary-600 text-white'
+                                    : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600'
+                            }`}
                         >
                             {category}
-                        </motion.h2>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {menu.filter(item => item.category === category).map((item, index) => (
-                                <motion.div
-                                    key={item._id || item.id}
-                                    initial={{ opacity: 0, y: 20 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: (idx * 0.1) + (index * 0.05) }}
-                                >
-                                    <MenuItemCard
-                                        item={item}
-                                        onAddToCart={(foodItem) => addToCart(foodItem, restaurant._id || restaurant.id)}
-                                    />
-                                </motion.div>
-                            ))}
+                        </button>
+                    ))}
+                </motion.div>
+            </div>
+
+            {/* Menu Section */}
+            <div className="max-w-7xl mx-auto px-4">
+                {Object.keys(categorizedItems).length > 0 ? (
+                    Object.entries(categorizedItems).map(([category, items], idx) => (
+                        <div key={category} className="mb-12">
+                            <motion.h2
+                                initial={{ opacity: 0, x: -20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ delay: idx * 0.1 }}
+                                className="text-2xl font-bold text-gray-900 dark:text-white mb-6"
+                            >
+                                {category}
+                            </motion.h2>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                {items.map((item, index) => (
+                                    <motion.div
+                                        key={item._id || item.id}
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: (idx * 0.1) + (index * 0.05) }}
+                                    >
+                                        <MenuItemCard
+                                            item={item}
+                                            onAddToCart={(foodItem) => addToCart(foodItem, restaurant._id || restaurant.id)}
+                                        />
+                                    </motion.div>
+                                ))}
+                            </div>
                         </div>
-                    </div>
-                ))}
-                {menu.length === 0 && (
-                    <div className="text-center py-20 text-gray-500">
-                        No menu items available for this restaurant.
+                    ))
+                ) : (
+                    <div className="text-center py-20 text-gray-500 dark:text-gray-400">
+                        <p className="text-lg">No menu items match your filters.</p>
+                        <button
+                            onClick={() => {
+                                setSearchTerm('');
+                                setPriceRange([0, 100]);
+                                setSelectedCategory('All');
+                            }}
+                            className="mt-4 text-primary-600 dark:text-primary-400 hover:underline font-medium"
+                        >
+                            Clear all filters
+                        </button>
                     </div>
                 )}
             </div>

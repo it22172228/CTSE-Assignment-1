@@ -176,17 +176,17 @@ const OwnerDashboard = () => {
     }
 
     return (
-        <div className="min-h-screen py-12 px-4 bg-gray-50">
+        <div className="min-h-screen py-12 px-4 bg-gray-50 dark:bg-dark">
             <div className="max-w-6xl mx-auto">
-                <h1 className="text-3xl font-bold mb-8 text-gray-900">Owner Dashboard</h1>
+                <h1 className="text-3xl font-bold mb-8 text-gray-900 dark:text-white">Owner Dashboard</h1>
 
                 <div className="flex gap-6">
                     {/* Sidebar - Restaurant Selection */}
-                    <div className="w-1/3 bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                        <h3 className="font-semibold text-lg mb-4 text-gray-900">Your Restaurants</h3>
+                    <div className="w-1/3 bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
+                        <h3 className="font-semibold text-lg mb-4 text-gray-900 dark:text-white">Your Restaurants</h3>
                         <div className="space-y-2 max-h-96 overflow-y-auto">
                             {restaurants.length === 0 ? (
-                                <p className="text-sm text-gray-500">No restaurants yet</p>
+                                <p className="text-sm text-gray-500 dark:text-gray-400">No restaurants yet</p>
                             ) : (
                                 restaurants.map(r => (
                                     <button
@@ -194,12 +194,12 @@ const OwnerDashboard = () => {
                                         onClick={() => setSelected(r)}
                                         className={`w-full text-left p-3 rounded-lg transition-colors ${
                                             selected && (selected._id || selected.id) === (r._id || r.id)
-                                                ? 'bg-blue-50 border-l-4 border-primary-500'
-                                                : 'hover:bg-gray-50'
+                                                ? 'bg-blue-50 dark:bg-blue-900 border-l-4 border-primary-500'
+                                                : 'hover:bg-gray-50 dark:hover:bg-gray-700'
                                         }`}
                                     >
-                                        <div className="font-medium text-gray-900">{r.name}</div>
-                                        <div className="text-sm text-gray-500">{r.cuisine}</div>
+                                        <div className="font-medium text-gray-900 dark:text-white">{r.name}</div>
+                                        <div className="text-sm text-gray-500 dark:text-gray-400">{r.cuisine}</div>
                                     </button>
                                 ))
                             )}
@@ -214,23 +214,23 @@ const OwnerDashboard = () => {
                     </div>
 
                     {/* Main Content */}
-                    <div className="flex-1 bg-white rounded-2xl shadow-sm border border-gray-100">
+                    <div className="flex-1 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
                         {!selected ? (
-                            <div className="p-8 text-center text-gray-500">
-                                <ChefHat size={48} className="mx-auto mb-4 text-gray-300" />
+                            <div className="p-8 text-center text-gray-500 dark:text-gray-400">
+                                <ChefHat size={48} className="mx-auto mb-4 text-gray-300 dark:text-gray-600" />
                                 <p>Select or create a restaurant to get started</p>
                             </div>
                         ) : (
                             <>
                                 {/* Tabs */}
-                                <div className="border-b border-gray-200 p-6 pb-0">
+                                <div className="border-b dark:border-gray-700 border-gray-200 p-6 pb-0">
                                     <div className="flex gap-4">
                                         <button
                                             onClick={() => setActiveTab('orders')}
                                             className={`pb-3 px-1 font-semibold text-sm border-b-2 transition-colors ${
                                                 activeTab === 'orders'
-                                                    ? 'border-primary-500 text-primary-600'
-                                                    : 'border-transparent text-gray-600 hover:text-gray-900'
+                                                    ? 'border-primary-500 text-primary-600 dark:text-primary-400'
+                                                    : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
                                             }`}
                                         >
                                             <Package size={16} className="inline mr-2" /> Orders
@@ -239,8 +239,8 @@ const OwnerDashboard = () => {
                                             onClick={() => setActiveTab('menu')}
                                             className={`pb-3 px-1 font-semibold text-sm border-b-2 transition-colors ${
                                                 activeTab === 'menu'
-                                                    ? 'border-primary-500 text-primary-600'
-                                                    : 'border-transparent text-gray-600 hover:text-gray-900'
+                                                    ? 'border-primary-500 text-primary-600 dark:text-primary-400'
+                                                    : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
                                             }`}
                                         >
                                             <ChefHat size={16} className="inline mr-2" /> Menu
@@ -249,30 +249,30 @@ const OwnerDashboard = () => {
                                 </div>
 
                                 <div className="p-6">
-                                    {errorMsg && <div className="bg-red-50 text-red-700 p-4 rounded-lg mb-4 border border-red-200">{errorMsg}</div>}
-                                    {successMsg && <div className="bg-green-50 text-green-700 p-4 rounded-lg mb-4 border border-green-200">{successMsg}</div>}
+                                    {errorMsg && <div className="bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 p-4 rounded-lg mb-4 border border-red-200 dark:border-red-800">{errorMsg}</div>}
+                                    {successMsg && <div className="bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 p-4 rounded-lg mb-4 border border-green-200 dark:border-green-800">{successMsg}</div>}
 
                                     {/* Orders Tab */}
                                     {activeTab === 'orders' && (
                                         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
                                             {orders.length === 0 ? (
-                                                <p className="text-center text-gray-500">No orders yet</p>
+                                                <p className="text-center text-gray-500 dark:text-gray-400">No orders yet</p>
                                             ) : (
                                                 orders.map(order => {
                                                     const nextStatus = getNextStatus(order.status);
                                                     return (
-                                                        <div key={order._id} className="border border-gray-200 rounded-lg p-4">
+                                                        <div key={order._id} className="border dark:border-gray-700 dark:bg-gray-800 border-gray-200 rounded-lg p-4">
                                                             <div className="flex justify-between items-start mb-3">
                                                                 <div>
-                                                                    <p className="font-semibold text-gray-900">Order #{order._id?.slice(-4) || order.id?.slice(-4)}</p>
-                                                                    <p className="text-sm text-gray-500">User: {order.userId}</p>
+                                                                    <p className="font-semibold text-gray-900 dark:text-white">Order #{order._id?.slice(-4) || order.id?.slice(-4)}</p>
+                                                                    <p className="text-sm text-gray-500 dark:text-gray-400">User: {order.userId}</p>
                                                                 </div>
-                                                                <span className="text-lg font-bold text-primary-600">${order.total || 0}</span>
+                                                                <span className="text-lg font-bold text-primary-600 dark:text-primary-400">${order.total || 0}</span>
                                                             </div>
 
                                                             <div className="mb-3">
-                                                                <p className="text-sm font-medium text-gray-700 mb-2">Items:</p>
-                                                                <ul className="text-sm text-gray-600 space-y-1">
+                                                                <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Items:</p>
+                                                                <ul className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
                                                                     {(order.items || []).map((item, idx) => (
                                                                         <li key={idx}>• {item.name} x{item.quantity}</li>
                                                                     ))}
@@ -315,21 +315,21 @@ const OwnerDashboard = () => {
                                             </button>
 
                                             {menu.length === 0 ? (
-                                                <p className="text-center text-gray-500">No menu items yet</p>
+                                                <p className="text-center text-gray-500 dark:text-gray-400">No menu items yet</p>
                                             ) : (
                                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                                     {menu.map(item => (
-                                                        <div key={item._id || item.id} className="border border-gray-200 rounded-lg overflow-hidden">
+                                                        <div key={item._id || item.id} className="border border-gray-200 dark:border-gray-700 dark:bg-gray-800 rounded-lg overflow-hidden">
                                                             {item.image && (
                                                                 <img src={item.image} alt={item.name} className="w-full h-40 object-cover" />
                                                             )}
                                                             <div className="p-4">
-                                                                <h4 className="font-semibold text-gray-900">{item.name}</h4>
-                                                                <p className="text-sm text-gray-500">{item.category}</p>
-                                                                <p className="text-lg font-bold text-primary-600 mt-2">${item.price}</p>
+                                                                <h4 className="font-semibold text-gray-900 dark:text-white">{item.name}</h4>
+                                                                <p className="text-sm text-gray-500 dark:text-gray-400">{item.category}</p>
+                                                                <p className="text-lg font-bold text-primary-600 dark:text-primary-400 mt-2">${item.price}</p>
                                                                 <button
                                                                     onClick={() => handleDelete(item._id || item.id)}
-                                                                    className="w-full mt-3 px-3 py-2 bg-red-50 text-red-700 rounded hover:bg-red-100 transition flex items-center justify-center gap-2 font-medium text-sm"
+                                                                    className="w-full mt-3 px-3 py-2 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 rounded hover:bg-red-100 dark:hover:bg-red-900/40 transition flex items-center justify-center gap-2 font-medium text-sm"
                                                                 >
                                                                     <Trash2 size={16} /> Delete
                                                                 </button>
@@ -352,9 +352,9 @@ const OwnerDashboard = () => {
                         <motion.div
                             initial={{ scale: 0.9, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
-                            className="bg-white rounded-lg p-6 max-w-md w-full mx-4"
+                            className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4"
                         >
-                            <h2 className="text-2xl font-bold mb-4 text-gray-900">
+                            <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">
                                 {activeTab === 'menu' ? 'Add Menu Item' : 'Create Restaurant'}
                             </h2>
 
@@ -365,33 +365,33 @@ const OwnerDashboard = () => {
                                         placeholder="Item Name"
                                         value={form.name}
                                         onChange={(e) => setForm({ ...form, name: e.target.value })}
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg mb-3 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                                        className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 mb-3 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                                     />
                                     <input
                                         type="number"
                                         placeholder="Price"
                                         value={form.price}
                                         onChange={(e) => setForm({ ...form, price: e.target.value })}
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg mb-3 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                                        className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 mb-3 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                                     />
                                     <input
                                         type="text"
                                         placeholder="Category"
                                         value={form.category}
                                         onChange={(e) => setForm({ ...form, category: e.target.value })}
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg mb-3 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                                        className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 mb-3 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                                     />
                                     <input
                                         type="text"
                                         placeholder="Image URL"
                                         value={form.image}
                                         onChange={(e) => setForm({ ...form, image: e.target.value })}
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg mb-4 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                                        className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 mb-4 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                                     />
                                     <div className="flex gap-3">
                                         <button
                                             onClick={() => setShowModal(false)}
-                                            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition font-medium"
+                                            className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition font-medium"
                                         >
                                             Cancel
                                         </button>
@@ -410,26 +410,26 @@ const OwnerDashboard = () => {
                                         placeholder="Restaurant Name"
                                         value={restaurantForm.name}
                                         onChange={(e) => setRestaurantForm({ ...restaurantForm, name: e.target.value })}
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg mb-3 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                                        className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 mb-3 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                                     />
                                     <input
                                         type="text"
                                         placeholder="Cuisine Type"
                                         value={restaurantForm.cuisine}
                                         onChange={(e) => setRestaurantForm({ ...restaurantForm, cuisine: e.target.value })}
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg mb-3 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                                        className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 mb-3 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                                     />
                                     <input
                                         type="text"
                                         placeholder="Image URL"
                                         value={restaurantForm.image}
                                         onChange={(e) => setRestaurantForm({ ...restaurantForm, image: e.target.value })}
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg mb-4 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                                        className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 mb-4 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                                     />
                                     <div className="flex gap-3">
                                         <button
                                             onClick={() => setShowModal(false)}
-                                            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition font-medium"
+                                            className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition font-medium"
                                         >
                                             Cancel
                                         </button>

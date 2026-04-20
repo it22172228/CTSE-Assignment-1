@@ -4,6 +4,7 @@ import { AnimatePresence } from 'framer-motion';
 
 import { useAuth } from './context/AuthContext';
 import { useCart } from './context/CartContext';
+import { ThemeProvider } from './context/ThemeContext';
 import { notificationAPI } from './utils/api';
 
 import Navbar from './components/Navbar';
@@ -69,9 +70,10 @@ function App() {
   const cartCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
 
   return (
-    <Router>
-      <div className="min-h-screen bg-gray-50 flex flex-col font-sans">
-        <Navbar cartCount={cartCount} toggleCart={toggleDrawer} />
+    <ThemeProvider>
+      <Router>
+        <div className="min-h-screen bg-gray-50 dark:bg-dark flex flex-col font-sans transition-colors duration-300">
+          <Navbar cartCount={cartCount} toggleCart={toggleDrawer} />
 
         <CartDrawer
           isOpen={isDrawerOpen}
@@ -127,6 +129,7 @@ function App() {
         </main>
       </div>
     </Router>
+    </ThemeProvider>
   );
 }
 

@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { orderAPI } from '../utils/api';
 import { useAuth } from '../context/AuthContext';
 import OrderTimeline from '../components/OrderTimeline';
+import socketService from '../utils/socket';
 import { ChevronLeft, Receipt } from 'lucide-react';
 
 const OrderTrackingPage = () => {
@@ -13,7 +14,7 @@ const OrderTrackingPage = () => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // Polling order status every 5 seconds for real-time feel
+        // Fetch initial order data
         const fetchOrder = async () => {
             try {
                 if (!user) return;
@@ -30,8 +31,25 @@ const OrderTrackingPage = () => {
         };
 
         fetchOrder();
-        const interval = setInterval(fetchOrder, 5000);
-        return () => clearInterval(interval);
+
+        // Connect to WebSocket for real-time updates
+        if (user) {
+            socketService.connect(user?.id || user?._id);
+            
+            // Listen for order status updates
+            socketService.on('orderStatusUpdated', (data) => {
+                if (data.orderId === id || data.orderId === order?._id) {
+                    setOrder(prev => ({
+                        ...prev,
+                        status: data.status
+                    }));
+                }
+            });
+        }
+
+        return () => {
+            socketService.off('orderStatusUpdated', null);
+        };
     }, [id, user]);
 
     if (loading) return (

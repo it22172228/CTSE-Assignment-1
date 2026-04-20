@@ -92,6 +92,17 @@ const updateOrderStatus = async (req, res, next) => {
         order.status = status;
         const updatedOrder = await order.save();
 
+        // Emit WebSocket event to user
+        const io = req.app.get('io');
+        if (io) {
+            io.to(`user:${order.userId}`).emit('orderStatusUpdated', {
+                orderId: updatedOrder._id,
+                status: updatedOrder.status,
+                message: `Your order status is now: ${status}`,
+                timestamp: new Date()
+            });
+        }
+
         // Publish status update event to Notification Service
         try {
             const notificationUrl = process.env.NOTIFICATION_SERVICE_URL || 'http://localhost:2000/api';
