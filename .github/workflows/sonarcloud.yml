@@ -25,6 +25,10 @@ jobs:
           SONAR_TOKEN: ${{ secrets.CTSE }}
         run: |
           set -e
+          # Explicitly set JAVA_HOME to Java 17 provided by actions/setup-java
+          export JAVA_HOME=$JAVA_HOME_17_X64
+          export PATH=$JAVA_HOME/bin:$PATH
+          
           SCANNER_VERSION=4.8.1.3023
           ARCHIVE=sonar-scanner-cli-${SCANNER_VERSION}-linux.zip
           URL="https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/${ARCHIVE}"
@@ -40,6 +44,9 @@ jobs:
             exit 1
           fi
           echo "Using scanner dir: ${SCANNER_DIR}"
+          echo "Java version being used:"
+          java -version
+          
           chmod +x "${SCANNER_DIR}bin/sonar-scanner"
           "${SCANNER_DIR}bin/sonar-scanner" \
             -Dsonar.host.url=https://sonarcloud.io \
