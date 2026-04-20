@@ -1,0 +1,25 @@
+name: SonarCloud Scan
+on: [push, pull_request]
+
+jobs:
+  sonar:
+    name: SonarCloud
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      - name: Install frontend dependencies
+        run: |
+          cd frontend
+          npm ci
+      - name: Run SonarCloud Analysis
+        uses: SonarSource/sonarcloud-github-action@v1.10
+        with:
+          args: >
+            -Dsonar.organization=asho-1308
+            -Dsonar.projectKey=asho-1308_ctse-assignment-1
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
