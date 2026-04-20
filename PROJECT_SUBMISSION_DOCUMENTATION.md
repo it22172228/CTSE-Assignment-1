@@ -801,6 +801,13 @@ permissions:
 
 ---
 
+## Security
+
+- See SECURITY.md for DevSecOps integration, SonarCloud and Snyk CI workflows, and guidance on least-privilege IAM, NSGs, and runtime hardening.
+
+
+---
+
 ## Dockerfile and Container Configuration
 
 ### 1. User Service Dockerfile

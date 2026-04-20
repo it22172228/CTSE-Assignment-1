@@ -55,7 +55,14 @@ function App() {
           }
         }
       } catch (error) {
-        console.error("Error fetching notifications:", error);
+        // Better logging for debugging notification failures
+        if (error.response) {
+          console.error(`Error fetching notifications: ${error.response.status} ${error.response.statusText}`, error.response.data);
+        } else if (error.request) {
+          console.error('Error fetching notifications: no response received', error.request);
+        } else {
+          console.error('Error fetching notifications:', error.message);
+        }
       }
     };
 
