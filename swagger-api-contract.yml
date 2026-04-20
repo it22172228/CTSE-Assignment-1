@@ -1,0 +1,1192 @@
+openapi: 3.0.0
+info:
+  title: SmartEat Microservices API
+  description: |
+    Complete API documentation for the SmartEat application microservices.
+    This includes User Service, Restaurant Service, Order Service, and Notification Service.
+  version: 1.0.0
+  contact:
+    name: Development Team
+    email: dev@smarteat.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost:1000/api
+    description: User Service (Local Development)
+  - url: http://localhost:4000/api
+    description: Restaurant Service (Local Development)
+  - url: http://localhost:3000/api
+    description: Order Service (Local Development)
+  - url: http://localhost:2000/api
+    description: Notification Service (Local Development)
+  - url: https://user-app.wittyglacier-d214fa2c.southeastasia.azurecontainerapps.io/api
+    description: User Service (Production Azure)
+  - url: https://restaurant-app.wittyglacier-d214fa2c.southeastasia.azurecontainerapps.io/api
+    description: Restaurant Service (Production Azure)
+  - url: https://order-app.wittyglacier-d214fa2c.southeastasia.azurecontainerapps.io/api
+    description: Order Service (Production Azure)
+  - url: https://notification-app.wittyglacier-d214fa2c.southeastasia.azurecontainerapps.io/api
+    description: Notification Service (Production Azure)
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token required for protected endpoints
+
+  schemas:
+    User:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: MongoDB ObjectId
+          example: "507f1f77bcf86cd799439011"
+        name:
+          type: string
+          description: User's full name
+          example: "John Doe"
+        email:
+          type: string
+          format: email
+          description: User's email address
+          example: "john@example.com"
+        role:
+          type: string
+          enum: [customer, restaurant_owner, admin]
+          description: User's role
+          example: "customer"
+        createdAt:
+          type: string
+          format: date-time
+          description: Account creation timestamp
+          example: "2024-03-20T10:30:00Z"
+      required:
+        - _id
+        - name
+        - email
+        - role
+        - createdAt
+
+    RegisterRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          example: "John Doe"
+        email:
+          type: string
+          format: email
+          example: "john@example.com"
+        password:
+          type: string
+          minLength: 6
+          example: "SecurePassword123"
+      required:
+        - name
+        - email
+        - password
+
+    LoginRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          example: "john@example.com"
+        password:
+          type: string
+          example: "SecurePassword123"
+      required:
+        - email
+        - password
+
+    AuthResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "Login successful"
+        token:
+          type: string
+          description: JWT authentication token
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        user:
+          $ref: '#/components/schemas/User'
+
+    Restaurant:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: "507f1f77bcf86cd799439022"
+        name:
+          type: string
+          example: "Pasta Italia"
+        address:
+          type: string
+          example: "123 Main Street, City"
+        cuisine:
+          type: string
+          example: "Italian"
+        rating:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 5
+          example: 4.5
+        image:
+          type: string
+          format: uri
+          example: "https://example.com/restaurant.jpg"
+        ownerId:
+          type: string
+          description: ID of the restaurant owner
+          example: "507f1f77bcf86cd799439011"
+        createdAt:
+          type: string
+          format: date-time
+          example: "2024-03-20T10:30:00Z"
+
+    CreateRestaurantRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "Pasta Italia"
+        address:
+          type: string
+          example: "123 Main Street, City"
+        cuisine:
+          type: string
+          example: "Italian"
+        rating:
+          type: number
+          format: float
+          example: 4.5
+        image:
+          type: string
+          format: uri
+          example: "https://example.com/restaurant.jpg"
+      required:
+        - name
+        - address
+        - cuisine
+
+    MenuItem:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: "507f1f77bcf86cd799439033"
+        restaurantId:
+          type: string
+          example: "507f1f77bcf86cd799439022"
+        name:
+          type: string
+          example: "Spaghetti Carbonara"
+        description:
+          type: string
+          example: "Traditional Italian pasta with bacon and cream sauce"
+        price:
+          type: number
+          format: float
+          minimum: 0
+          example: 12.99
+        image:
+          type: string
+          format: uri
+          example: "https://example.com/dish.jpg"
+
+    CreateMenuItemRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "Spaghetti Carbonara"
+        description:
+          type: string
+          example: "Traditional Italian pasta with bacon and cream sauce"
+        price:
+          type: number
+          format: float
+          example: 12.99
+        image:
+          type: string
+          format: uri
+          example: "https://example.com/dish.jpg"
+      required:
+        - name
+        - description
+        - price
+
+    UpdateMenuItemRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "Spaghetti Carbonara"
+        description:
+          type: string
+          example: "Traditional Italian pasta with bacon and cream sauce"
+        price:
+          type: number
+          format: float
+          example: 12.99
+        image:
+          type: string
+          format: uri
+          example: "https://example.com/dish.jpg"
+
+    OrderItem:
+      type: object
+      properties:
+        menuItemId:
+          type: string
+          example: "507f1f77bcf86cd799439033"
+        quantity:
+          type: integer
+          minimum: 1
+          example: 2
+        price:
+          type: number
+          format: float
+          example: 12.99
+
+    Order:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: "507f1f77bcf86cd799439044"
+        restaurantId:
+          type: string
+          example: "507f1f77bcf86cd799439022"
+        userId:
+          type: string
+          example: "507f1f77bcf86cd799439011"
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderItem'
+        totalAmount:
+          type: number
+          format: float
+          example: 29.98
+        deliveryAddress:
+          type: string
+          example: "456 Oak Road, City"
+        status:
+          type: string
+          enum: [pending, confirmed, preparing, ready, delivered, cancelled]
+          example: "pending"
+        createdAt:
+          type: string
+          format: date-time
+          example: "2024-03-20T10:30:00Z"
+
+    CreateOrderRequest:
+      type: object
+      properties:
+        restaurantId:
+          type: string
+          example: "507f1f77bcf86cd799439022"
+        userId:
+          type: string
+          example: "507f1f77bcf86cd799439011"
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderItem'
+        totalAmount:
+          type: number
+          format: float
+          example: 29.98
+        deliveryAddress:
+          type: string
+          example: "456 Oak Road, City"
+        status:
+          type: string
+          enum: [pending, confirmed, preparing, ready, delivered, cancelled]
+          default: "pending"
+      required:
+        - restaurantId
+        - userId
+        - items
+        - totalAmount
+        - deliveryAddress
+
+    UpdateOrderStatusRequest:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [pending, confirmed, preparing, ready, delivered, cancelled]
+          example: "confirmed"
+      required:
+        - status
+
+    Notification:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: "507f1f77bcf86cd799439055"
+        userId:
+          type: string
+          example: "507f1f77bcf86cd799439011"
+        type:
+          type: string
+          enum: [order_update, order_delivered, order_cancelled, payment_confirmed]
+          example: "order_update"
+        message:
+          type: string
+          example: "Your order has been confirmed"
+        orderId:
+          type: string
+          example: "507f1f77bcf86cd799439044"
+        read:
+          type: boolean
+          default: false
+          example: false
+        createdAt:
+          type: string
+          format: date-time
+          example: "2024-03-20T10:30:00Z"
+
+    CreateNotificationRequest:
+      type: object
+      properties:
+        userId:
+          type: string
+          example: "507f1f77bcf86cd799439011"
+        type:
+          type: string
+          enum: [order_update, order_delivered, order_cancelled, payment_confirmed]
+          example: "order_update"
+        message:
+          type: string
+          example: "Your order has been confirmed"
+        orderId:
+          type: string
+          example: "507f1f77bcf86cd799439044"
+        read:
+          type: boolean
+          default: false
+      required:
+        - userId
+        - type
+        - message
+
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        message:
+          type: string
+          example: "Error message"
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+              message:
+                type: string
+
+    SuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+        message:
+          type: string
+
+tags:
+  - name: Authentication
+    description: User authentication endpoints
+  - name: User
+    description: User profile endpoints
+  - name: Restaurant
+    description: Restaurant management endpoints
+  - name: Menu
+    description: Menu item endpoints
+  - name: Order
+    description: Order management endpoints
+  - name: Notification
+    description: Notification endpoints
+
+paths:
+  /auth/register:
+    post:
+      tags:
+        - Authentication
+      summary: Register a new user
+      description: Create a new user account
+      operationId: registerUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Email already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: Login user
+      description: Authenticate user with email and password
+      operationId: loginUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /users/{id}:
+    get:
+      tags:
+        - User
+      summary: Get user profile
+      description: Retrieve user profile information
+      operationId: getUserProfile
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: User ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: User profile retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/User'
+        '401':
+          description: Unauthorized - missing or invalid token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /restaurants:
+    get:
+      tags:
+        - Restaurant
+      summary: List all restaurants
+      description: Get a list of all available restaurants
+      operationId: getRestaurants
+      responses:
+        '200':
+          description: List of restaurants
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Restaurant'
+    post:
+      tags:
+        - Restaurant
+      summary: Create a new restaurant
+      description: Create a new restaurant (requires authentication)
+      operationId: createRestaurant
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRestaurantRequest'
+      responses:
+        '201':
+          description: Restaurant created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/Restaurant'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /restaurants/{id}:
+    get:
+      tags:
+        - Restaurant
+      summary: Get restaurant by ID
+      description: Retrieve detailed information about a specific restaurant
+      operationId: getRestaurantById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Restaurant ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Restaurant details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/Restaurant'
+        '404':
+          description: Restaurant not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      tags:
+        - Restaurant
+      summary: Update restaurant
+      description: Update restaurant details (requires authentication)
+      operationId: updateRestaurant
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Restaurant ID
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRestaurantRequest'
+      responses:
+        '200':
+          description: Restaurant updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/Restaurant'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Restaurant not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags:
+        - Restaurant
+      summary: Delete restaurant
+      description: Delete a restaurant (requires authentication)
+      operationId: deleteRestaurant
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Restaurant ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Restaurant deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Restaurant not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /restaurants/owner:
+    get:
+      tags:
+        - Restaurant
+      summary: Get owner's restaurants
+      description: Get list of restaurants owned by authenticated user
+      operationId: getOwnerRestaurants
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: List of owner's restaurants
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Restaurant'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /restaurants/{id}/menu:
+    get:
+      tags:
+        - Menu
+      summary: Get restaurant menu
+      description: Get all menu items for a specific restaurant
+      operationId: getMenuByRestaurant
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Restaurant ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of menu items
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/MenuItem'
+        '404':
+          description: Restaurant not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      tags:
+        - Menu
+      summary: Create menu item
+      description: Add a new menu item to a restaurant
+      operationId: createMenuItem
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Restaurant ID
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateMenuItemRequest'
+      responses:
+        '201':
+          description: Menu item created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/MenuItem'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /restaurants/{id}/menu/{menuId}:
+    put:
+      tags:
+        - Menu
+      summary: Update menu item
+      description: Update details of a menu item
+      operationId: updateMenuItem
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Restaurant ID
+          schema:
+            type: string
+        - name: menuId
+          in: path
+          required: true
+          description: Menu Item ID
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateMenuItemRequest'
+      responses:
+        '200':
+          description: Menu item updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/MenuItem'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Menu item not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags:
+        - Menu
+      summary: Delete menu item
+      description: Remove a menu item from a restaurant
+      operationId: deleteMenuItem
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Restaurant ID
+          schema:
+            type: string
+        - name: menuId
+          in: path
+          required: true
+          description: Menu Item ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Menu item deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Menu item not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /orders:
+    post:
+      tags:
+        - Order
+      summary: Create order
+      description: Create a new order
+      operationId: createOrder
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrderRequest'
+      responses:
+        '201':
+          description: Order created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/Order'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /orders/{userId}:
+    get:
+      tags:
+        - Order
+      summary: Get user's orders
+      description: Retrieve all orders for a specific user
+      operationId: getOrdersByUser
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: User ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of orders
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Order'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /orders/restaurant/{restaurantId}:
+    get:
+      tags:
+        - Order
+      summary: Get restaurant's orders
+      description: Retrieve all orders for a specific restaurant
+      operationId: getOrdersByRestaurant
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: restaurantId
+          in: path
+          required: true
+          description: Restaurant ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of orders
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Order'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /orders/{orderId}/status:
+    put:
+      tags:
+        - Order
+      summary: Update order status
+      description: Update the status of an order
+      operationId: updateOrderStatus
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          description: Order ID
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateOrderStatusRequest'
+      responses:
+        '200':
+          description: Order status updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/Order'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Order not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /notifications:
+    post:
+      tags:
+        - Notification
+      summary: Create notification
+      description: Create a new notification (usually called by services)
+      operationId: createNotification
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateNotificationRequest'
+      responses:
+        '201':
+          description: Notification created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/Notification'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /notifications/{userId}:
+    get:
+      tags:
+        - Notification
+      summary: Get user's notifications
+      description: Retrieve all notifications for a specific user
+      operationId: getNotificationsByUser
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: User ID
+          schema:
+            type: string
+        - name: read
+          in: query
+          required: false
+          description: Filter by read status
+          schema:
+            type: boolean
+        - name: limit
+          in: query
+          required: false
+          description: Limit number of results
+          schema:
+            type: integer
+            default: 50
+        - name: skip
+          in: query
+          required: false
+          description: Number of results to skip
+          schema:
+            type: integer
+            default: 0
+      responses:
+        '200':
+          description: List of notifications
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Notification'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'

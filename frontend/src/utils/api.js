@@ -1,16 +1,10 @@
 import axios from 'axios';
 
-// Since we are running microservices on different ports, we define them here.
-// In production, an API Gateway would route these.
-// Local service ports:
-// User Service: 1000
-// Notification Service: 2000
-// Order Service: 3000
-// Restaurant Service: 4000
-const USER_API = 'http://localhost:1000/api';
-const RESTAURANT_API = 'http://localhost:4000/api';
-const ORDER_API = 'http://localhost:3000/api';
-const NOTIFICATION_API = 'http://localhost:2000/api';
+// Service URLs - load from environment (support two common variable names) or use defaults
+const USER_API = import.meta.env.VITE_USER_API || import.meta.env.VITE_USER_SERVICE_URL || 'http://localhost:1000/api';
+const RESTAURANT_API = import.meta.env.VITE_RESTAURANT_API || import.meta.env.VITE_RESTAURANT_SERVICE_URL || 'http://localhost:4000/api';
+const ORDER_API = import.meta.env.VITE_ORDER_API || import.meta.env.VITE_ORDER_SERVICE_URL || 'http://localhost:3000/api';
+const NOTIFICATION_API = import.meta.env.VITE_NOTIFICATION_API || import.meta.env.VITE_NOTIFICATION_SERVICE_URL || 'http://localhost:2000/api';
 
 const getAuthHeaders = () => {
     const token = localStorage.getItem('token');

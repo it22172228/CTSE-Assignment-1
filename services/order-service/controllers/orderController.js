@@ -38,7 +38,8 @@ const createOrder = async (req, res, next) => {
         // Publish event to Notification Service
         try {
             const notificationUrl = process.env.NOTIFICATION_SERVICE_URL || 'http://localhost:2000/api';
-            await axios.post(`${notificationUrl}/notifications`, {
+            const sendUrl = notificationUrl.replace(/\/$/, '').endsWith('/notifications') ? notificationUrl.replace(/\/$/, '') : `${notificationUrl.replace(/\/$/, '')}/notifications`;
+            await axios.post(sendUrl, {
                 userId: req.user.id,
                 message: `Your order ${order._id} has been placed successfully. Total: $${order.total}`
             });
@@ -105,7 +106,8 @@ const updateOrderStatus = async (req, res, next) => {
         // Publish status update event to Notification Service
         try {
             const notificationUrl = process.env.NOTIFICATION_SERVICE_URL || 'http://localhost:2000/api';
-            await axios.post(`${notificationUrl}/notifications`, {
+            const sendUrl = notificationUrl.replace(/\/$/, '').endsWith('/notifications') ? notificationUrl.replace(/\/$/, '') : `${notificationUrl.replace(/\/$/, '')}/notifications`;
+            await axios.post(sendUrl, {
                 userId: order.userId,
                 message: `Your order ${order._id} status is now: ${status}`
             });

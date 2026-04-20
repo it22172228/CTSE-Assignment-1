@@ -11,6 +11,51 @@ Currently, two official plugins are available:
 
 The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
 
-## Expanding the ESLint configuration
+## Project Overview
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+This frontend is part of the CTSE Assignment 1 food ordering microservices app. It uses React + Vite, TailwindCSS and integrates with backend microservices for:
+
+- User authentication and profile management (`user-service`)
+- Restaurant and menu management (`restaurant-service`)
+- Order placement and tracking (`order-service`)
+- Notification delivery (`notification-service`)
+
+## Setup & Run
+
+1. Install dependencies
+
+```bash
+cd frontend
+npm install
+```
+
+2. Start the development server
+
+```bash
+npm run dev
+```
+
+3. Open http://localhost:5173 in your browser
+
+## Environment & API endpoints
+
+Make sure the backend services are running and the following URLs are accessible (check the root `docker-compose.yml` or each service config):
+
+- Auth: `http://localhost:5000` (change as needed)
+- Restaurants: `http://localhost:5001`
+- Orders: `http://localhost:5002`
+- Notifications: `http://localhost:5003`
+
+## Build for production
+
+```bash
+npm run build
+```
+
+## Commit message guidance
+
+Add your change details and purpose, for example:
+
+- `docs(frontend): update README with project setup and architecture details`
+- `chore: add instructions for running microservices with frontend`
+

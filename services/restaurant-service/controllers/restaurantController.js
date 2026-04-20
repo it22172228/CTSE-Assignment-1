@@ -49,7 +49,8 @@ const createRestaurant = async (req, res, next) => {
             const notificationUrl = process.env.NOTIFICATION_SERVICE_URL || 'http://localhost:2000/api';
             // Send notifications to admin users (admin role in the system)
             // For now, we'll send a notification that indicates a new restaurant was created
-            await axios.post(`${notificationUrl}/notifications`, {
+            const sendUrl = notificationUrl.replace(/\/$/, '').endsWith('/notifications') ? notificationUrl.replace(/\/$/, '') : `${notificationUrl.replace(/\/$/, '')}/notifications`;
+            await axios.post(sendUrl, {
                 userId: 'admin',
                 message: `New restaurant "${name}" has been registered by owner ${ownerId}. Admin review pending.`
             });
@@ -114,7 +115,8 @@ const createMenuItem = async (req, res, next) => {
         // Notify users that new menu item is available (optional)
         try {
             const notificationUrl = process.env.NOTIFICATION_SERVICE_URL || 'http://localhost:2000/api';
-            await axios.post(`${notificationUrl}/notifications`, {
+            const sendUrl = notificationUrl.replace(/\/$/, '').endsWith('/notifications') ? notificationUrl.replace(/\/$/, '') : `${notificationUrl.replace(/\/$/, '')}/notifications`;
+            await axios.post(sendUrl, {
                 userId: 'all_users',
                 message: `New item "${name}" added to ${restaurant.name}! Only $${price}`
             });
