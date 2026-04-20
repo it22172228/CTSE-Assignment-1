@@ -37,13 +37,54 @@ const getUserAnalytics = async (req, res, next) => {
             }
         });
 
+        // Get monthly user registrations for the last 12 months
+        const monthlyRegistrations = {};
+        for (let i = 11; i >= 0; i--) {
+            const date = new Date();
+            date.setMonth(date.getMonth() - i);
+            const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+            monthlyRegistrations[monthKey] = 0;
+        }
+
+        allUsers.forEach(user => {
+            const userDate = new Date(user.createdAt);
+            const monthKey = `${userDate.getFullYear()}-${String(userDate.getMonth() + 1).padStart(2, '0')}`;
+            if (monthlyRegistrations.hasOwnProperty(monthKey)) {
+                monthlyRegistrations[monthKey]++;
+            }
+        });
+
+        // Get user growth by role over time (simplified - last 12 months)
+        const userGrowthByRole = {
+            user: monthlyRegistrations,
+            owner: { ...monthlyRegistrations },
+            admin: { ...monthlyRegistrations }
+        };
+
+        // Reset and calculate properly
+        Object.keys(userGrowthByRole.user).forEach(month => {
+            userGrowthByRole.user[month] = 0;
+            userGrowthByRole.owner[month] = 0;
+            userGrowthByRole.admin[month] = 0;
+        });
+
+        allUsers.forEach(user => {
+            const userDate = new Date(user.createdAt);
+            const monthKey = `${userDate.getFullYear()}-${String(userDate.getMonth() + 1).padStart(2, '0')}`;
+            if (userGrowthByRole[user.role] && userGrowthByRole[user.role].hasOwnProperty(monthKey)) {
+                userGrowthByRole[user.role][monthKey]++;
+            }
+        });
+
         res.json({
             totalUsers,
             usersByRole,
             lastSevenDays,
             activeAdmins: usersByRole.admin,
             activeOwners: usersByRole.owner,
-            regularUsers: usersByRole.user
+            regularUsers: usersByRole.user,
+            monthlyRegistrations,
+            userGrowthByRole
         });
     } catch (error) {
         next(error);

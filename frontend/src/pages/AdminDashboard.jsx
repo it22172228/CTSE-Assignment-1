@@ -6,6 +6,21 @@ import { useCart } from '../context/CartContext';
 import { motion } from 'framer-motion';
 import { BarChart3, Users, UtensilsCrossed, TrendingUp, AlertCircle, DollarSign, ShoppingCart } from 'lucide-react';
 import axios from 'axios';
+import {
+    LineChart,
+    Line,
+    BarChart,
+    Bar,
+    PieChart,
+    Pie,
+    Cell,
+    XAxis,
+    YAxis,
+    CartesianGrid,
+    Tooltip,
+    Legend,
+    ResponsiveContainer
+} from 'recharts';
 
 const AdminDashboard = () => {
     const { user } = useAuth();
@@ -21,10 +36,16 @@ const AdminDashboard = () => {
     });
     const [orderStats, setOrderStats] = useState({
         ordersByStatus: {},
-        lastSevenDays: {}
+        lastSevenDays: {},
+        monthlyRevenue: {},
+        topRestaurants: [],
+        ordersByHour: []
     });
     const [userStats, setUserStats] = useState({
-        usersByRole: {}
+        usersByRole: {},
+        lastSevenDays: {},
+        monthlyRegistrations: {},
+        userGrowthByRole: {}
     });
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
@@ -65,7 +86,10 @@ const AdminDashboard = () => {
                     const orderData = orderAnalyticsRes.data;
                     setOrderStats({
                         ordersByStatus: orderData.ordersByStatus || {},
-                        lastSevenDays: orderData.lastSevenDays || {}
+                        lastSevenDays: orderData.lastSevenDays || {},
+                        monthlyRevenue: orderData.monthlyRevenue || {},
+                        topRestaurants: orderData.topRestaurants || [],
+                        ordersByHour: orderData.ordersByHour || []
                     });
 
                     setStats(prev => ({
@@ -89,7 +113,10 @@ const AdminDashboard = () => {
                     
                     const userData = userAnalyticsRes.data;
                     setUserStats({
-                        usersByRole: userData.usersByRole || {}
+                        usersByRole: userData.usersByRole || {},
+                        lastSevenDays: userData.lastSevenDays || {},
+                        monthlyRegistrations: userData.monthlyRegistrations || {},
+                        userGrowthByRole: userData.userGrowthByRole || {}
                     });
 
                     setStats(prev => ({
@@ -339,6 +366,146 @@ const AdminDashboard = () => {
                             </div>
                         </div>
                     ))}
+                </motion.div>
+
+                {/* Advanced Analytics Charts */}
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.45 }}
+                    className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12"
+                >
+                    {/* Daily Orders Chart */}
+                    <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                        <h3 className="text-lg font-bold text-gray-900 mb-4">Daily Orders (Last 7 Days)</h3>
+                        {loading ? (
+                            <div className="flex items-center justify-center h-64">
+                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                            </div>
+                        ) : Object.keys(orderStats.lastSevenDays).length > 0 ? (
+                            <ResponsiveContainer width="100%" height={300}>
+                                <LineChart data={Object.entries(orderStats.lastSevenDays).map(([date, count]) => ({
+                                    date: new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+                                    orders: count
+                                }))}>
+                                    <CartesianGrid strokeDasharray="3 3" />
+                                    <XAxis dataKey="date" />
+                                    <YAxis />
+                                    <Tooltip />
+                                    <Line type="monotone" dataKey="orders" stroke="#3b82f6" strokeWidth={2} />
+                                </LineChart>
+                            </ResponsiveContainer>
+                        ) : (
+                            <div className="flex items-center justify-center h-64 text-gray-500">
+                                No data available
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Orders by Status Chart */}
+                    <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                        <h3 className="text-lg font-bold text-gray-900 mb-4">Orders by Status</h3>
+                        <ResponsiveContainer width="100%" height={300}>
+                            <BarChart data={Object.entries(orderStats.ordersByStatus).map(([status, count]) => ({
+                                status: status.replace(/_/g, ' '),
+                                count
+                            }))}>
+                                <CartesianGrid strokeDasharray="3 3" />
+                                <XAxis dataKey="status" />
+                                <YAxis />
+                                <Tooltip />
+                                <Bar dataKey="count" fill="#10b981" />
+                            </BarChart>
+                        </ResponsiveContainer>
+                    </div>
+
+                    {/* Monthly Revenue Chart */}
+                    <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                        <h3 className="text-lg font-bold text-gray-900 mb-4">Monthly Revenue (Last 12 Months)</h3>
+                        {loading ? (
+                            <div className="flex items-center justify-center h-64">
+                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
+                            </div>
+                        ) : Object.keys(orderStats.monthlyRevenue).length > 0 ? (
+                            <ResponsiveContainer width="100%" height={300}>
+                                <LineChart data={Object.entries(orderStats.monthlyRevenue).map(([month, revenue]) => ({
+                                    month: new Date(month + '-01').toLocaleDateString('en-US', { year: 'numeric', month: 'short' }),
+                                    revenue: parseFloat(revenue.toFixed(2))
+                                }))}>
+                                    <CartesianGrid strokeDasharray="3 3" />
+                                    <XAxis dataKey="month" />
+                                    <YAxis />
+                                    <Tooltip formatter={(value) => [`$${value}`, 'Revenue']} />
+                                    <Line type="monotone" dataKey="revenue" stroke="#f59e0b" strokeWidth={2} />
+                                </LineChart>
+                            </ResponsiveContainer>
+                        ) : (
+                            <div className="flex items-center justify-center h-64 text-gray-500">
+                                No data available
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Users by Role Pie Chart */}
+                    <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                        <h3 className="text-lg font-bold text-gray-900 mb-4">Users by Role</h3>
+                        <ResponsiveContainer width="100%" height={300}>
+                            <PieChart>
+                                <Pie
+                                    data={Object.entries(userStats.usersByRole).map(([role, count]) => ({
+                                        name: role.charAt(0).toUpperCase() + role.slice(1),
+                                        value: count
+                                    }))}
+                                    cx="50%"
+                                    cy="50%"
+                                    labelLine={false}
+                                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                                    outerRadius={80}
+                                    fill="#8884d8"
+                                    dataKey="value"
+                                >
+                                    {Object.entries(userStats.usersByRole).map((entry, index) => (
+                                        <Cell key={`cell-${index}`} fill={['#3b82f6', '#10b981', '#f59e0b'][index % 3]} />
+                                    ))}
+                                </Pie>
+                                <Tooltip />
+                            </PieChart>
+                        </ResponsiveContainer>
+                    </div>
+
+                    {/* Top Restaurants by Revenue */}
+                    <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                        <h3 className="text-lg font-bold text-gray-900 mb-4">Top Restaurants by Revenue</h3>
+                        <ResponsiveContainer width="100%" height={300}>
+                            <BarChart data={orderStats.topRestaurants.slice(0, 5).map((restaurant, index) => ({
+                                name: `Restaurant ${index + 1}`,
+                                revenue: parseFloat(restaurant.revenue.toFixed(2))
+                            }))}>
+                                <CartesianGrid strokeDasharray="3 3" />
+                                <XAxis dataKey="name" />
+                                <YAxis />
+                                <Tooltip formatter={(value) => [`$${value}`, 'Revenue']} />
+                                <Bar dataKey="revenue" fill="#8b5cf6" />
+                            </BarChart>
+                        </ResponsiveContainer>
+                    </div>
+
+                    {/* User Registrations Over Time */}
+                    <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                        <h3 className="text-lg font-bold text-gray-900 mb-4">User Registrations (Last 12 Months)</h3>
+                        <ResponsiveContainer width="100%" height={300}>
+                            <LineChart data={Object.entries(userStats.monthlyRegistrations).map(([month, count]) => ({
+                                month: new Date(month + '-01').toLocaleDateString('en-US', { year: 'numeric', month: 'short' }),
+                                registrations: count
+                            }))}>
+                                <CartesianGrid strokeDasharray="3 3" />
+                                <XAxis dataKey="month" />
+                                <YAxis />
+                                <Tooltip />
+                                <Line type="monotone" dataKey="registrations" stroke="#ef4444" strokeWidth={2} />
+                            </LineChart>
+                        </ResponsiveContainer>
+                    </div>
                 </motion.div>
 
                 {/* Restaurants Table */}
