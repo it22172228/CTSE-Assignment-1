@@ -42,6 +42,7 @@ jobs:
           echo "Using scanner dir: ${SCANNER_DIR}"
           chmod +x "${SCANNER_DIR}bin/sonar-scanner"
           "${SCANNER_DIR}bin/sonar-scanner" \
+            -Dsonar.host.url=https://sonarcloud.io \
             -Dsonar.organization=asho-1308 \
             -Dsonar.projectKey=asho-1308_ctse-assignment-1 \
             -Dsonar.login=${SONAR_TOKEN}
