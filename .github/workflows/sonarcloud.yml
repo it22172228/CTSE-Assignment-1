@@ -20,11 +20,20 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
-      - name: Run SonarCloud Analysis
-        uses: SonarSource/sonarcloud-github-action@v1
-        with:
-          args: >
-            -Dsonar.organization=asho-1308
-            -Dsonar.projectKey=asho-1308_ctse-assignment-1
+      - name: Run SonarScanner CLI
         env:
           SONAR_TOKEN: ${{ secrets.CTSE }}
+        run: |
+          set -e
+          SCANNER_VERSION=4.8.1.3023
+          ARCHIVE=sonar-scanner-cli-${SCANNER_VERSION}-linux.zip
+          URL="https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/${ARCHIVE}"
+          echo "Downloading SonarScanner ${SCANNER_VERSION}..."
+          curl -sSLo ${ARCHIVE} ${URL}
+          unzip -q ${ARCHIVE}
+          SCANNER_DIR=$(echo sonar-scanner-cli-*/)
+          export PATH="$PWD/${SCANNER_DIR}bin:$PATH"
+          sonar-scanner \
+            -Dsonar.organization=asho-1308 \
+            -Dsonar.projectKey=asho-1308_ctse-assignment-1 \
+            -Dsonar.login=${SONAR_TOKEN}
