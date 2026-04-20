@@ -25,9 +25,10 @@ jobs:
           SONAR_TOKEN: ${{ secrets.CTSE }}
         run: |
           set -e
-          # Explicitly set JAVA_HOME to Java 17 provided by actions/setup-java
+          # SONAR_JAVA_PATH is documentation for some versions, but setting it explicitly helps
           export JAVA_HOME=$JAVA_HOME_17_X64
           export PATH=$JAVA_HOME/bin:$PATH
+          export SONAR_JAVA_PATH="$JAVA_HOME/bin/java"
           
           SCANNER_VERSION=4.8.1.3023
           ARCHIVE=sonar-scanner-cli-${SCANNER_VERSION}-linux.zip
@@ -36,15 +37,15 @@ jobs:
           curl -sSLo ${ARCHIVE} ${URL}
           echo "Extracting..."
           unzip -o -q ${ARCHIVE}
-          # Show contents for debugging
-          ls -F
+          
           SCANNER_DIR=$(ls -d sonar-scanner-*/ 2>/dev/null | head -n1 || ls -d sonar-scanner-cli-*/ 2>/dev/null | head -n1)
-          if [ -z "$SCANNER_DIR" ]; then
-            echo "Error: Could not find scanner directory after unzip"
-            exit 1
-          fi
+          
+          # CRITICAL: The scanner often looks at the 'java' command in its own properties.
+          # We will force the scanner to use the setup-java version by overriding the property file
+          echo "sonar.java.jdkHome=$JAVA_HOME" >> "${SCANNER_DIR}conf/sonar-scanner.properties"
+          
           echo "Using scanner dir: ${SCANNER_DIR}"
-          echo "Java version being used:"
+          echo "Java version being used by shell:"
           java -version
           
           chmod +x "${SCANNER_DIR}bin/sonar-scanner"
@@ -52,4 +53,5 @@ jobs:
             -Dsonar.host.url=https://sonarcloud.io \
             -Dsonar.organization=asho-1308 \
             -Dsonar.projectKey=asho-1308_ctse-assignment-1 \
-            -Dsonar.login=${SONAR_TOKEN}
+            -Dsonar.login=${SONAR_TOKEN} \
+            -Dsonar.scanner.skipJreProvisioning=true
