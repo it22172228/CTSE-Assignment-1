@@ -16,7 +16,7 @@ jobs:
           cd frontend
           npm ci
       - name: Run SonarCloud Analysis
-        uses: SonarSource/sonarcloud-github-action@v1.10
+        uses: SonarSource/sonarcloud-github-action@v1
         with:
           args: >
             -Dsonar.organization=asho-1308
