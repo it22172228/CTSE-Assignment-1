@@ -31,9 +31,13 @@ jobs:
           echo "Downloading SonarScanner ${SCANNER_VERSION}..."
           curl -sSLo ${ARCHIVE} ${URL}
           unzip -q ${ARCHIVE}
-          SCANNER_DIR=$(echo sonar-scanner-cli-*/)
-          export PATH="$PWD/${SCANNER_DIR}bin:$PATH"
-          sonar-scanner \
+          # find the extracted scanner directory (first match)
+          SCANNER_DIR=$(ls -d sonar-scanner-cli-*/ | head -n1)
+          echo "Using scanner dir: ${SCANNER_DIR}"
+          # ensure executable
+          chmod +x "${SCANNER_DIR}bin/sonar-scanner"
+          # run scanner by full path to avoid PATH issues
+          "${SCANNER_DIR}bin/sonar-scanner" \
             -Dsonar.organization=asho-1308 \
             -Dsonar.projectKey=asho-1308_ctse-assignment-1 \
             -Dsonar.login=${SONAR_TOKEN}
