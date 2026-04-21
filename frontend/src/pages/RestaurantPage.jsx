@@ -13,7 +13,7 @@ const RestaurantPage = () => {
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('All');
-    const [priceRange, setPriceRange] = useState([0, 100]);
+    const [priceRange, setPriceRange] = useState([0, 1000]);
     const { addToCart } = useCart();
 
     useEffect(() => {
@@ -140,7 +140,7 @@ const RestaurantPage = () => {
                             <input
                                 type="range"
                                 min="0"
-                                max="100"
+                                max="1000"
                                 value={priceRange[1]}
                                 onChange={(e) => setPriceRange([0, parseFloat(e.target.value)])}
                                 className="w-full"
