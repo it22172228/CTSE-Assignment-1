@@ -50,9 +50,17 @@ const createRestaurant = async (req, res, next) => {
             // Send notifications to admin users (admin role in the system)
             // For now, we'll send a notification that indicates a new restaurant was created
             const sendUrl = notificationUrl.replace(/\/$/, '').endsWith('/notifications') ? notificationUrl.replace(/\/$/, '') : `${notificationUrl.replace(/\/$/, '')}/notifications`;
+            
+            // Notify the owner (current user)
             await axios.post(sendUrl, {
-                userId: 'admin',
-                message: `New restaurant "${name}" has been registered by owner ${ownerId}. Admin review pending.`
+                userId: ownerId.toString(),
+                message: `Restaurant "${name}" created successfully!`
+            });
+
+            // Also keep the admin notification
+            await axios.post(sendUrl, {
+                userId: 'all_users',
+                message: `New restaurant "${name}" has been registered!`
             });
         } catch (notificationError) {
             console.error('Failed to send admin notification:', notificationError.message);
