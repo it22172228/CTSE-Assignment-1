@@ -33,7 +33,7 @@ const CartDrawer = ({ isOpen, onClose, cartItems, updateQuantity, clearCart }) =
                     >
                         <div className="flex items-center justify-between p-6 border-b border-gray-100">
                             <h2 className="text-2xl font-bold flex items-center gap-2">
-                                <ShoppingBag /> Your Cart
+                                <ShoppingBag /> Your Cart //this displays the cart tag
                             </h2>
                             <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
                                 <X size={24} />
