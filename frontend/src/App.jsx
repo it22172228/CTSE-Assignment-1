@@ -35,10 +35,12 @@ function App() {
   const { user } = useAuth();
   const [notification, setNotification] = useState(null);
   const [lastNotificationId, setLastNotificationId] = useState(null);
+  const [shownIds, setShownIds] = useState(new Set());
 
   // Simple polling for notifications
   useEffect(() => {
     if (!user) {
+      setShownIds(new Set());
       setLastNotificationId(null);
       return;
     }
@@ -50,18 +52,17 @@ function App() {
         const { data } = await notificationAPI.getUserNotifications(userId);
         
         if (Array.isArray(data) && data.length > 0) {
-          const latestNotification = data[0]; // Newest is first
-          console.log('Latest notification from server:', latestNotification._id, 'Last shown ID:', lastNotificationId);
+          // Filter out already shown IDs to find genuinely new ones
+          const newNotifications = data.filter(n => !shownIds.has(n._id));
           
-          // Only show if this is a new notification we haven't shown yet
-          if (lastNotificationId !== latestNotification._id) {
-            console.log('Displaying new notification to user');
-            setNotification(latestNotification);
-            setLastNotificationId(latestNotification._id);
+          if (newNotifications.length > 0) {
+            const nextNotification = newNotifications[0]; // Take the newest unheard one
+            console.log('Displaying next unread notification:', nextNotification._id);
+            setNotification(nextNotification);
+            
+            setShownIds(prev => new Set(prev).add(nextNotification._id));
+            setLastNotificationId(nextNotification._id);
           }
-        } else {
-          // If no notifications exist, reset lastNotificationId so the next first one shows
-          setLastNotificationId(null);
         }
       } catch (error) {
         // Better logging for debugging notification failures
