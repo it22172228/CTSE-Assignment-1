@@ -58,16 +58,7 @@ jobs:
         tags: |
           ${{ env.REGISTRY }}/${{ matrix.service }}:${{ github.sha }}
           ${{ env.REGISTRY }}/${{ matrix.service }}:latest
-    
-    - name: Azure login
-      uses: azure/login@v1
-      with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
-    
-    - name: Deploy to Container Apps
-      run: |
-        az containerapp update \
-          --resource-group ${{ env.RESOURCE_GROUP }} \
-          --name ${{ matrix.app }} \
-          --image ${{ env.REGISTRY }}/${{ matrix.service }}:${{ github.sha }}
+
+# Azure Container Apps will automatically restart if Continuous Deployment is enabled in the portal.
+# This avoids the need for a Service Principal login which is restricted on your account.
 
