@@ -13,7 +13,7 @@ const RestaurantPage = () => {
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('All');
-    const [priceRange, setPriceRange] = useState([0, 1000]);
+    const [priceRange, setPriceRange] = useState([0, 10000]);
     const { addToCart } = useCart();
 
     useEffect(() => {

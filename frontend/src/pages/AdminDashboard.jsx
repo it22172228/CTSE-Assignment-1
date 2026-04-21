@@ -76,12 +76,7 @@ const AdminDashboard = () => {
 
                 // Fetch order analytics
                 try {
-                    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:1000/api';
-                    const orderAnalyticsRes = await axios.get(`${apiBaseUrl.replace('/api', '')}/api/analytics`, {
-                        headers: {
-                            Authorization: `Bearer ${localStorage.getItem('token')}`
-                        }
-                    });
+                    const orderAnalyticsRes = await orderAPI.getAnalytics();
                     
                     const orderData = orderAnalyticsRes.data;
                     setOrderStats({
@@ -104,12 +99,7 @@ const AdminDashboard = () => {
 
                 // Fetch user analytics
                 try {
-                    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:1000/api';
-                    const userAnalyticsRes = await axios.get(`${apiBaseUrl.replace('/api', '')}/api/analytics`, {
-                        headers: {
-                            Authorization: `Bearer ${localStorage.getItem('token')}`
-                        }
-                    });
+                    const userAnalyticsRes = await authAPI.getAnalytics();
                     
                     const userData = userAnalyticsRes.data;
                     setUserStats({
