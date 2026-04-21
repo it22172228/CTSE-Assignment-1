@@ -1,10 +1,10 @@
 import axios from 'axios';
 
 // Service URLs - load from environment (support two common variable names) or use defaults
-const USER_API = (import.meta.env.VITE_USER_API || import.meta.env.VITE_USER_SERVICE_URL || 'http://localhost:1000/api').replace(/\/$/, '');
-const RESTAURANT_API = (import.meta.env.VITE_RESTAURANT_API || import.meta.env.VITE_RESTAURANT_SERVICE_URL || 'http://localhost:4000/api').replace(/\/$/, '');
-const ORDER_API = (import.meta.env.VITE_ORDER_API || import.meta.env.VITE_ORDER_SERVICE_URL || 'http://localhost:3000/api').replace(/\/$/, '');
-const NOTIFICATION_API = (import.meta.env.VITE_NOTIFICATION_API || import.meta.env.VITE_NOTIFICATION_SERVICE_URL || 'http://localhost:2000/api').replace(/\/$/, '');
+const USER_API = import.meta.env.VITE_USER_API || import.meta.env.VITE_USER_SERVICE_URL || 'http://localhost:1000/api';
+const RESTAURANT_API = import.meta.env.VITE_RESTAURANT_API || import.meta.env.VITE_RESTAURANT_SERVICE_URL || 'http://localhost:4000/api';
+const ORDER_API = import.meta.env.VITE_ORDER_API || import.meta.env.VITE_ORDER_SERVICE_URL || 'http://localhost:3000/api';
+const NOTIFICATION_API = import.meta.env.VITE_NOTIFICATION_API || import.meta.env.VITE_NOTIFICATION_SERVICE_URL || 'http://localhost:2000/api';
 
 const getAuthHeaders = () => {
     const token = localStorage.getItem('token');
@@ -15,6 +15,7 @@ export const authAPI = {
     login: (data) => axios.post(`${USER_API}/auth/login`, data),
     register: (data) => axios.post(`${USER_API}/auth/register`, data),
     getUser: (id) => axios.get(`${USER_API}/users/${id}`, { headers: getAuthHeaders() }),
+    getAnalytics: () => axios.get(`${USER_API}/analytics`, { headers: getAuthHeaders() }),
 };
 
 export const restaurantAPI = {
@@ -36,6 +37,7 @@ export const orderAPI = {
     getUserOrders: (userId) => axios.get(`${ORDER_API}/orders/${userId}`, { headers: getAuthHeaders() }),
     getRestaurantOrders: (restaurantId) => axios.get(`${ORDER_API}/orders/restaurant/${restaurantId}`, { headers: getAuthHeaders() }),
     updateOrderStatus: (orderId, status) => axios.put(`${ORDER_API}/orders/${orderId}/status`, { status }, { headers: getAuthHeaders() }),
+    getAnalytics: () => axios.get(`${ORDER_API}/analytics`, { headers: getAuthHeaders() }),
 };
 
 export const notificationAPI = {

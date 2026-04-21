@@ -87,6 +87,8 @@ resources:
                 secretRef: mongo-uri
               - name: JWT_SECRET
                 secretRef: jwt-secret
+              - name: NOTIFICATION_SERVICE_URL
+                value: '[concat(''https://'', reference(resourceId(''Microsoft.App/containerApps'', ''notification-service''), ''2023-04-01-preview'').configuration.ingress.fqdn, ''/api'')]'
               - name: NODE_ENV
                 value: production
         scale:
@@ -136,6 +138,8 @@ resources:
                 secretRef: mongo-uri
               - name: JWT_SECRET
                 secretRef: jwt-secret
+              - name: NOTIFICATION_SERVICE_URL
+                value: '[concat(''https://'', reference(resourceId(''Microsoft.App/containerApps'', ''notification-service''), ''2023-04-01-preview'').configuration.ingress.fqdn, ''/api'')]'
               - name: NODE_ENV
                 value: production
         scale:
@@ -181,6 +185,12 @@ resources:
                 secretRef: mongo-uri
               - name: JWT_SECRET
                 secretRef: jwt-secret
+              - name: FRONTEND_URL
+                value: '[reference(resourceId(''Microsoft.App/containerApps'', ''frontend''), ''2023-04-01-preview'').configuration.ingress.fqdn]'
+              - name: NOTIFICATION_SERVICE_URL
+                value: '[concat(''https://'', reference(resourceId(''Microsoft.App/containerApps'', ''notification-service''), ''2023-04-01-preview'').configuration.ingress.fqdn, ''/api'')]'
+              - name: RESTAURANT_SERVICE_URL
+                value: '[concat(''https://'', reference(resourceId(''Microsoft.App/containerApps'', ''restaurant-service''), ''2023-04-01-preview'').configuration.ingress.fqdn, ''/api'')]'
               - name: NODE_ENV
                 value: production
         scale:

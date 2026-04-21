@@ -36,21 +36,48 @@ const OrderTrackingPage = () => {
         if (user) {
             socketService.connect(user?.id || user?._id);
             
-            // Listen for order status updates
-            socketService.on('orderStatusUpdated', (data) => {
-                if (data.orderId === id || data.orderId === order?._id) {
+            const handleOrderUpdate = (data) => {
+                console.log('Received order status update:', data);
+                const receivedId = data.orderId?.toString();
+                const currentId = id?.toString();
+                
+                if (receivedId === currentId) {
                     setOrder(prev => ({
                         ...prev,
                         status: data.status
                     }));
                 }
-            });
-        }
+            };
 
-        return () => {
-            socketService.off('orderStatusUpdated', null);
-        };
+            // Listen for order status updates
+            socketService.on('orderStatusUpdated', handleOrderUpdate);
+
+            return () => {
+                socketService.off('orderStatusUpdated', handleOrderUpdate);
+            };
+        }
     }, [id, user]);
+
+    // Polling fallback - every 5 seconds
+    useEffect(() => {
+        if (!user || !id) return;
+
+        const pollOrder = async () => {
+            try {
+                const { data } = await orderAPI.getUserOrders(user?.id || user?._id);
+                const orderMatch = data.find(o => o._id === id || o.id === id);
+                if (orderMatch && orderMatch.status !== order?.status) {
+                    console.log('Polling updated order status:', orderMatch.status);
+                    setOrder(orderMatch);
+                }
+            } catch (error) {
+                console.error('Failed to poll order update:', error);
+            }
+        };
+
+        const intervalId = setInterval(pollOrder, 5000);
+        return () => clearInterval(intervalId);
+    }, [id, user, order?.status]);
 
     if (loading) return (
         <div className="min-h-screen flex items-center justify-center">

@@ -2,6 +2,7 @@ const Notification = require('../models/Notification');
 
 const createNotification = async (req, res, next) => {
     try {
+        console.log('Incoming notification request:', req.body);
         const { userId, message } = req.body;
 
         if (!userId || !message) {

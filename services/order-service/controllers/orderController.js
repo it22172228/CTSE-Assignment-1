@@ -96,7 +96,7 @@ const updateOrderStatus = async (req, res, next) => {
         const io = req.app.get('io');
         if (io) {
             io.to(`user:${order.userId}`).emit('orderStatusUpdated', {
-                orderId: updatedOrder._id,
+                orderId: updatedOrder._id.toString(),
                 status: updatedOrder.status,
                 message: `Your order status is now: ${status}`,
                 timestamp: new Date()
