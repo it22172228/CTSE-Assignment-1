@@ -1,6 +1,7 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const axios = require('axios');
 
 const generateToken = (id, role) => {
     return jwt.sign({ id, role }, process.env.JWT_SECRET, {
@@ -38,8 +39,20 @@ const registerUser = async (req, res, next) => {
         });
 
         if (user) {
+            // Send notification
+            try {
+                const notificationUrl = process.env.NOTIFICATION_SERVICE_URL || 'http://localhost:2000/api';
+                const sendUrl = notificationUrl.replace(/\/$/, '').endsWith('/notifications') ? notificationUrl.replace(/\/$/, '') : `${notificationUrl.replace(/\/$/, '')}/notifications`;
+                await axios.post(sendUrl, {
+                    userId: user._id.toString(),
+                    message: `Welcome to our platform, ${user.name}! Your account has been successfully registered.`
+                });
+            } catch (notificationError) {
+                console.error('Failed to send registration notification:', notificationError.message);
+            }
+
             res.status(201).json({
-                id: user._id,
+                id: user._id.toString(),
                 name: user.name,
                 email: user.email,
                 role: user.role,
@@ -63,8 +76,23 @@ const loginUser = async (req, res, next) => {
         const user = await User.findOne({ email });
 
         if (user && (await bcrypt.compare(password, user.password))) {
+            console.log('User logged in, sending notification for:', user._id.toString());
+            // Send notification
+            try {
+                const notificationUrl = process.env.NOTIFICATION_SERVICE_URL || 'http://localhost:2000/api';
+                const sendUrl = notificationUrl.replace(/\/$/, '').endsWith('/notifications') ? notificationUrl.replace(/\/$/, '') : `${notificationUrl.replace(/\/$/, '')}/notifications`;
+                console.log('Sending notification to:', sendUrl);
+                const response = await axios.post(sendUrl, {
+                    userId: user._id.toString(),
+                    message: `Successful login! Welcome back, ${user.name}.`
+                });
+                console.log('Notification sent, response status:', response.status);
+            } catch (notificationError) {
+                console.error('Failed to send login notification:', notificationError.message);
+            }
+
             res.json({
-                id: user._id,
+                id: user._id.toString(),
                 name: user.name,
                 email: user.email,
                 role: user.role,

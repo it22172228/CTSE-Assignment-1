@@ -38,21 +38,30 @@ function App() {
 
   // Simple polling for notifications
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      setLastNotificationId(null);
+      return;
+    }
 
     const checkNotifications = async () => {
       try {
-        const { data } = await notificationAPI.getUserNotifications(user.id || user._id);
+        const userId = user.id || user._id;
+        console.log('Checking notifications for user:', userId);
+        const { data } = await notificationAPI.getUserNotifications(userId);
         
         if (Array.isArray(data) && data.length > 0) {
           const latestNotification = data[0]; // Newest is first
+          console.log('Latest notification from server:', latestNotification._id, 'Last shown ID:', lastNotificationId);
           
           // Only show if this is a new notification we haven't shown yet
           if (lastNotificationId !== latestNotification._id) {
+            console.log('Displaying new notification to user');
             setNotification(latestNotification);
             setLastNotificationId(latestNotification._id);
-            console.log('New notification:', latestNotification);
           }
+        } else {
+          // If no notifications exist, reset lastNotificationId so the next first one shows
+          setLastNotificationId(null);
         }
       } catch (error) {
         // Better logging for debugging notification failures

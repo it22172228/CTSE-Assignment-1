@@ -10,6 +10,8 @@ services:
       - "1000:1000"
     env_file:
       - ./services/user-service/.env
+    environment:
+      - NOTIFICATION_SERVICE_URL=http://notification-service:2000/api
     networks:
       - app_network
 
