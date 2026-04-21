@@ -1,6 +1,6 @@
 import io from 'socket.io-client';
 
-const SOCKET_URL = import.meta.env.VITE_ORDER_API?.replace('/api', '') || 'http://localhost:3000';
+const SOCKET_URL = import.meta.env.VITE_ORDER_API?.replace(/\/api$/, '') || 'http://localhost:3000';
 
 class SocketService {
     constructor() {
@@ -18,7 +18,9 @@ class SocketService {
             reconnectionDelay: 1000,
             reconnectionDelayMax: 5000,
             reconnectionAttempts: 10,
-            transports: ['websocket', 'polling']
+            transports: ['websocket', 'polling'],
+            withCredentials: true,
+            path: '/socket.io'
         });
 
         this.socket.on('connect', () => {
