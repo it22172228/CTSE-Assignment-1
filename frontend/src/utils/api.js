@@ -39,5 +39,5 @@ export const orderAPI = {
 };
 
 export const notificationAPI = {
-    getUserNotifications: (userId) => axios.get(`${NOTIFICATION_API}/api/notifications/${userId}`, { headers: getAuthHeaders() }),
+    getUserNotifications: (userId) => axios.get(`${NOTIFICATION_API}/notifications/${userId}`, { headers: getAuthHeaders() }),
 };
