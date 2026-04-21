@@ -22,7 +22,10 @@ const createNotification = async (req, res, next) => {
 
 const getNotificationsByUser = async (req, res, next) => {
     try {
-        const notifications = await Notification.find({ userId: req.params.userId }).sort({ createdAt: -1 });
+        const userId = req.params.userId;
+        const notifications = await Notification.find({ 
+            userId: { $in: [userId, 'all_users'] } 
+        }).sort({ createdAt: -1 });
         res.json(notifications);
     } catch (error) {
         next(error);
