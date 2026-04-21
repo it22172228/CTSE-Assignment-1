@@ -38,7 +38,10 @@ function App() {
 
   // Simple polling for notifications
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      setLastNotificationId(null);
+      return;
+    }
 
     const checkNotifications = async () => {
       try {
@@ -53,6 +56,9 @@ function App() {
             setLastNotificationId(latestNotification._id);
             console.log('New notification:', latestNotification);
           }
+        } else {
+          // If no notifications exist, reset lastNotificationId so the next first one shows
+          setLastNotificationId(null);
         }
       } catch (error) {
         // Better logging for debugging notification failures
